@@ -4,7 +4,11 @@ MusicButton::MusicButton() : Button::Button() {
     MusicButton::currentSprite = UNMUTED;
 }
 
-int MusicButton::handleEvents(SDL_Event* e) {
+MusicSprite MusicButton::getCurrentSprite() {
+    return MusicButton::currentSprite;
+}
+
+void MusicButton::handleEvents(SDL_Event* e) {
     if(e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONUP) {
         int x, y;
         SDL_GetMouseState(&x, &y);
@@ -49,5 +53,4 @@ int MusicButton::handleEvents(SDL_Event* e) {
         }
 
     }
-    return MusicButton::currentSprite;
 }

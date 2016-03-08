@@ -17,18 +17,22 @@ Texture gMusicTexture;
 SDL_Rect gMusicClip[TOTAL_MUSIC_SPRITES];
 MusicButton gMusicButton;
 
-//Background texture
+//Menu Background Texture
 Texture gBackgroundTexture;
 SDL_Rect gBackgroundClip;
 
-//Menu
-Texture menuChoices[3];
+//Menu Buttons
+MenuButton gMenuButtons[TOTAL_MENU_BUTTONS];
+
+//Menu Texture
+Texture menuChoices[TOTAL_MENU_BUTTONS];
 
 //Font
 TTF_Font* gFont = NULL;
 
-//Button
-MenuButton gMenuButtons[TOTAL_MENU_BUTTONS];
+//Court texture
+Texture gCourt;
+SDL_Rect gCourtClip;
 
 bool init();
 
@@ -41,8 +45,6 @@ int main(int argc, char* argv[]) {
         if(loadMedia()) {
             bool quit = false;
             SDL_Event e;
-            MusicSprite sprite = UNMUTED;
-            bool exit = false;
             Mix_PlayMusic(gMusic, -1);
             while(!quit) {
                 while(SDL_PollEvent(&e) != 0) {
@@ -50,27 +52,42 @@ int main(int argc, char* argv[]) {
                         quit = true;
                     }
                     for(int i = 0; i < 3; i++) {
-                       exit = gMenuButtons[i].handleEvents(&e);
-                       if(exit) {
-                        quit = true;
-                        break;
-                       }
+                        gMenuButtons[i].handleEvents(&e);
                     }
 
-                    sprite = (MusicSprite) gMusicButton.handleEvents(&e);
+                    gMusicButton.handleEvents(&e);
                 }
-
-                gMusicTexture.setColor(gMusicButton.getColor());
 
                 SDL_RenderClear(gRenderer);
 
-                gBackgroundTexture.render(0, 0, &gBackgroundClip);
+                gMusicTexture.setColor(gMusicButton.getColor());
 
-                for(int j = 0; j < 3; j++) {
-                    gMenuButtons[j].render(&menuChoices[j]);
+                if(gMenuButtons[PLAY].isClicked()) {
+                    gCourt.render(0, 0, &gCourtClip);
+                }
+                else if(gMenuButtons[OPTIONS].isClicked()) {
+
+                }
+                else if(gMenuButtons[EXIT].isClicked()) {
+                    quit = true;
+
+                    gBackgroundTexture.render(0, 0, &gBackgroundClip);
+
+                    for(int j = 0; j < 3; j++) {
+                        gMenuButtons[j].render(&menuChoices[j]);
+                    }
+                }
+                else {
+
+                    gBackgroundTexture.render(0, 0, &gBackgroundClip);
+
+                    for(int j = 0; j < 3; j++) {
+                        gMenuButtons[j].render(&menuChoices[j]);
+                    }
+
                 }
 
-                gMusicButton.render(&gMusicTexture, &gMusicClip[sprite]);
+                gMusicButton.render(&gMusicTexture, &gMusicClip[gMusicButton.getCurrentSprite()]);
 
                 SDL_RenderPresent(gRenderer);
             }
@@ -140,6 +157,17 @@ bool loadMedia() {
         gBackgroundClip.y = 400;
     }
 
+    if(!gCourt.loadFromFile("background/court.png")) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        gCourtClip.x = 500;
+        gCourtClip.y = 20;
+        gCourtClip.w = SCREEN_WIDTH;
+        gCourtClip.h = SCREEN_HEIGHT;
+    }
+
     if(!gMusicTexture.loadFromFile("music/icon.png")) {
         printf("%s\n", SDL_GetError());
         success = false;
@@ -172,30 +200,30 @@ bool loadMedia() {
     else {
         SDL_Color textColor = {0, 0, 0};
         //Play
-        if(!menuChoices[0].loadFromRenderedText("Play", textColor)) {
+        if(!menuChoices[PLAY].loadFromRenderedText("Play", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[0].setDimensions(430,30,menuChoices[0].getWidth(),menuChoices[0].getHeight());
-            gMenuButtons[0].setCurrentButton(PLAY);
+            gMenuButtons[PLAY].setDimensions(430,30,menuChoices[PLAY].getWidth(),menuChoices[PLAY].getHeight());
+            gMenuButtons[PLAY].setCurrentButton(PLAY);
         }
 
         //Options
-        if(!menuChoices[1].loadFromRenderedText("Options", textColor)) {
+        if(!menuChoices[OPTIONS].loadFromRenderedText("Options", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[1].setDimensions(170,300,menuChoices[1].getWidth(),menuChoices[1].getHeight());
-            gMenuButtons[1].setCurrentButton(OPTIONS);
+            gMenuButtons[OPTIONS].setDimensions(170,300,menuChoices[OPTIONS].getWidth(),menuChoices[OPTIONS].getHeight());
+            gMenuButtons[OPTIONS].setCurrentButton(OPTIONS);
         }
 
         //Exit
-        if(!menuChoices[2].loadFromRenderedText("Exit", textColor)) {
+        if(!menuChoices[EXIT].loadFromRenderedText("Exit", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[2].setDimensions(630,300,menuChoices[2].getWidth(),menuChoices[2].getHeight());
-            gMenuButtons[2].setCurrentButton(EXIT);
+            gMenuButtons[EXIT].setDimensions(630,300,menuChoices[EXIT].getWidth(),menuChoices[EXIT].getHeight());
+            gMenuButtons[EXIT].setCurrentButton(EXIT);
         }
     }
     return success;

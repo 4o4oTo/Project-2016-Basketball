@@ -4,9 +4,18 @@ MenuButton::MenuButton() : Button::Button() {}
 
 void MenuButton::setCurrentButton(MenuButtons b) {
     MenuButton::currentButton = b;
+    MenuButton::clicked = false;
 }
 
-int MenuButton::handleEvents(SDL_Event* e) {
+bool MenuButton::isClicked() {
+    return MenuButton::clicked;
+}
+
+void MenuButton::click() {
+    MenuButton::clicked = true;
+}
+
+void MenuButton::handleEvents(SDL_Event* e) {
     if(e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONUP) {
         int x, y;
         SDL_GetMouseState(&x, &y);
@@ -31,7 +40,13 @@ int MenuButton::handleEvents(SDL_Event* e) {
                 case SDL_MOUSEBUTTONDOWN:
                     MenuButton::_BColor = {255, 255, 255};
                     if(MenuButton::currentButton == EXIT) {
-                        return 1;
+                        click();
+                    }
+                    else if(MenuButton::currentButton == PLAY) {
+                        click();
+                    }
+                    else if(MenuButton::currentButton == OPTIONS) {
+                        click();
                     }
                     break;
 
@@ -45,5 +60,4 @@ int MenuButton::handleEvents(SDL_Event* e) {
             }
         }
     }
-    return 0;
 }

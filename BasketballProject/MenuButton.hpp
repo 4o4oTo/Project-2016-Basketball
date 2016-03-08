@@ -12,10 +12,15 @@ enum MenuButtons {
 
 class MenuButton : public Button {
     MenuButtons currentButton;
+    bool clicked;
 public:
     MenuButton();
 
-    int handleEvents(SDL_Event* e);
+    void handleEvents(SDL_Event* e);
+
+    bool isClicked();
+
+    void click();
 
     void setCurrentButton(MenuButtons b);
 

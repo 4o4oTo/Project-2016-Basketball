@@ -14,7 +14,9 @@ class MusicButton : public Button {
 public:
     MusicButton();
 
-    int handleEvents(SDL_Event* e);
+    void handleEvents(SDL_Event* e);
+
+    MusicSprite getCurrentSprite();
 
 };
 

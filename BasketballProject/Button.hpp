@@ -12,7 +12,7 @@ public:
 
     void setDimensions(int x, int y, int w, int h);
 
-    virtual int handleEvents(SDL_Event* e) = 0;
+    virtual void handleEvents(SDL_Event* e) = 0;
 
     SDL_Color getColor();
 

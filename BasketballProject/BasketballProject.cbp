@@ -12,6 +12,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-std=c++11" />
 					<Add option="-g" />
 				</Compiler>
 			</Target>
@@ -30,6 +31,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 			<Add directory="D:/GAMES/CodeBlocksProjects/SDL_dev_lib/include/SDL2" />
 			<Add directory="D:/GAMES/CodeBlocksProjects/MINGW32_dev_lib/include/SDL2" />
 			<Add directory="D:/GAMES/CodeBlocksProjects/TTF_dev_lib/include/SDL2" />
@@ -42,12 +44,18 @@
 			<Add directory="D:/GAMES/CodeBlocksProjects/TTF_dev_lib/lib" />
 			<Add directory="D:/GAMES/CodeBlocksProjects/SDL_Mixer/lib" />
 		</Linker>
+		<Unit filename="BasketballPole.cpp" />
+		<Unit filename="BasketballPole.hpp" />
+		<Unit filename="BlackPlayer.cpp" />
+		<Unit filename="BlackPlayer.hpp" />
 		<Unit filename="Button.cpp" />
 		<Unit filename="Button.hpp" />
 		<Unit filename="MenuButton.cpp" />
 		<Unit filename="MenuButton.hpp" />
 		<Unit filename="MusicButton.cpp" />
 		<Unit filename="MusicButton.hpp" />
+		<Unit filename="Player.cpp" />
+		<Unit filename="Player.hpp" />
 		<Unit filename="Texture.cpp" />
 		<Unit filename="Texture.hpp" />
 		<Unit filename="main.cpp" />

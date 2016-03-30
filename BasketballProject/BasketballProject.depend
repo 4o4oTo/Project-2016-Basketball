@@ -1,24 +1,25 @@
 # depslib dependency file v1.0
-1457307689 source:d:\games\codeblocksprojects\basketballproject\texture.cpp
+1459243514 source:d:\games\codeblocksprojects\basketballproject\texture.cpp
 	"Texture.hpp"
 
-1457309143 source:d:\games\codeblocksprojects\basketballproject\main.cpp
+1459277313 source:d:\games\codeblocksprojects\basketballproject\main.cpp
 	"Texture.hpp"
 	"main.hpp"
-	"Button.hpp"
 	"MusicButton.hpp"
 	"MenuButton.hpp"
+	"BlackPlayer.hpp"
+	"BasketballPole.hpp"
 
-1457307671 d:\games\codeblocksprojects\basketballproject\texture.hpp
+1459026400 d:\games\codeblocksprojects\basketballproject\texture.hpp
 	"main.hpp"
 
-1451800374 d:\games\codeblocksprojects\mingw32_dev_lib\include\sdl2\sdl_image.h
+1451803974 d:\games\codeblocksprojects\mingw32_dev_lib\include\sdl2\sdl_image.h
 	"SDL.h"
 	"SDL_version.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl.h
 	"SDL_main.h"
 	"SDL_stdinc.h"
 	"SDL_assert.h"
@@ -49,12 +50,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_main.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_main.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_stdinc.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_stdinc.h
 	"SDL_config.h"
 	<sys/types.h>
 	<stdio.h>
@@ -83,34 +84,34 @@
 	<stdlib.h>
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_config.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_config.h
 	"SDL_platform.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_platform.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_platform.h
 	"AvailabilityMacros.h"
 	"TargetConditionals.h"
 	<winapifamily.h>
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\begin_code.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\begin_code.h
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\close_code.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\close_code.h
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_assert.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_assert.h
 	"SDL_config.h"
 	"begin_code.h"
 	<signal.h>
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_atomic.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_atomic.h
 	"SDL_stdinc.h"
 	"SDL_platform.h"
 	"begin_code.h"
 	<mbarrier.h>
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_audio.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_audio.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_endian.h"
@@ -120,24 +121,24 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_error.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_error.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_endian.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_endian.h
 	"SDL_stdinc.h"
 	<endian.h>
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_mutex.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_mutex.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_thread.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_thread.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_atomic.h"
@@ -146,18 +147,18 @@
 	<process.h>
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_rwops.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_rwops.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_clipboard.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_clipboard.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_cpuinfo.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_cpuinfo.h
 	"SDL_stdinc.h"
 	<intrin.h>
 	<intrin.h>
@@ -169,7 +170,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_events.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_events.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
@@ -183,7 +184,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_video.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_video.h
 	"SDL_stdinc.h"
 	"SDL_pixels.h"
 	"SDL_rect.h"
@@ -191,12 +192,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_pixels.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_pixels.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_rect.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_rect.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_pixels.h"
@@ -204,7 +205,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_surface.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_surface.h
 	"SDL_stdinc.h"
 	"SDL_pixels.h"
 	"SDL_rect.h"
@@ -213,11 +214,11 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_blendmode.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_blendmode.h
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_keyboard.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_keyboard.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_keycode.h"
@@ -225,27 +226,27 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_keycode.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_keycode.h
 	"SDL_stdinc.h"
 	"SDL_scancode.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_scancode.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_scancode.h
 	"SDL_stdinc.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_mouse.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_mouse.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_joystick.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_joystick.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_gamecontroller.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_gamecontroller.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_rwops.h"
@@ -253,11 +254,11 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_quit.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_quit.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_gesture.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_gesture.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
@@ -265,60 +266,60 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_touch.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_touch.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_filesystem.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_filesystem.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_haptic.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_haptic.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_joystick.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_hints.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_hints.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_loadso.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_loadso.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_log.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_log.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_messagebox.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_messagebox.h
 	"SDL_stdinc.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_power.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_power.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_render.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_render.h
 	"SDL_stdinc.h"
 	"SDL_rect.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_system.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_system.h
 	"SDL_stdinc.h"
 	"SDL_keyboard.h"
 	"SDL_render.h"
@@ -326,52 +327,53 @@
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_timer.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_timer.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1451764694 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_version.h
+1451768294 d:\games\codeblocksprojects\sdl_dev_lib\include\sdl2\sdl_version.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1457307279 d:\games\codeblocksprojects\basketballproject\main.hpp
+1459267865 d:\games\codeblocksprojects\basketballproject\main.hpp
 	<string>
 	<SDL_image.h>
 	<SDL.h>
 	<SDL_ttf.h>
 	<stdio.h>
 	<SDL_mixer.h>
+	<windows.h>
 
-1454362934 d:\games\codeblocksprojects\ttf_dev_lib\include\sdl2\sdl_ttf.h
+1454366534 d:\games\codeblocksprojects\ttf_dev_lib\include\sdl2\sdl_ttf.h
 	"SDL.h"
 	"begin_code.h"
 	"close_code.h"
 
-1457301962 source:d:\games\codeblocksprojects\basketballproject\button.cpp
+1458155316 source:d:\games\codeblocksprojects\basketballproject\button.cpp
 	"Button.hpp"
 
-1457301929 d:\games\codeblocksprojects\basketballproject\button.hpp
+1458155266 d:\games\codeblocksprojects\basketballproject\button.hpp
 	"main.hpp"
 	"Texture.hpp"
 
-1457300004 d:\games\codeblocksprojects\basketballproject\musicbutton.hpp
+1458154746 d:\games\codeblocksprojects\basketballproject\musicbutton.hpp
 	"main.hpp"
 	"Button.hpp"
 
-1457304654 d:\games\codeblocksprojects\basketballproject\menubutton.hpp
+1458925559 d:\games\codeblocksprojects\basketballproject\menubutton.hpp
 	"main.hpp"
 	"Button.hpp"
 
-1457304734 source:d:\games\codeblocksprojects\basketballproject\menubutton.cpp
+1458925625 source:d:\games\codeblocksprojects\basketballproject\menubutton.cpp
 	"MenuButton.hpp"
 
-1457302214 source:d:\games\codeblocksprojects\basketballproject\musicbutton.cpp
+1458925511 source:d:\games\codeblocksprojects\basketballproject\musicbutton.cpp
 	"MusicButton.hpp"
 
-1451801792 d:\games\codeblocksprojects\sdl_mixer\include\sdl2\sdl_mixer.h
+1451805392 d:\games\codeblocksprojects\sdl_mixer\include\sdl2\sdl_mixer.h
 	"SDL_stdinc.h"
 	"SDL_rwops.h"
 	"SDL_audio.h"
@@ -379,4 +381,32 @@
 	"SDL_version.h"
 	"begin_code.h"
 	"close_code.h"
+
+1458770518 source:d:\games\codeblocksprojects\basketballproject\troy.cpp
+	"Troy.hpp"
+
+1459373961 source:d:\games\codeblocksprojects\basketballproject\player.cpp
+	"Player.hpp"
+
+1459276014 d:\games\codeblocksprojects\basketballproject\player.hpp
+	"main.hpp"
+	"Texture.hpp"
+
+1458770221 d:\games\codeblocksprojects\basketballproject\troy.hpp
+	"main.hpp"
+	"Player.hpp"
+
+1459373645 source:d:\games\codeblocksprojects\basketballproject\blackplayer.cpp
+	"BlackPlayer.hpp"
+
+1459274492 d:\games\codeblocksprojects\basketballproject\blackplayer.hpp
+	"main.hpp"
+	"Player.hpp"
+
+1459038040 source:d:\games\codeblocksprojects\basketballproject\basketballpole.cpp
+	"BasketballPole.hpp"
+
+1459242474 d:\games\codeblocksprojects\basketballproject\basketballpole.hpp
+	"main.hpp"
+	"Texture.hpp"
 

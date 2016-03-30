@@ -22,7 +22,11 @@ public:
 
     void click();
 
+    void unclick();
+
     void setCurrentButton(MenuButtons b);
+
+    void setClip(int x, int y, int w, int h);
 
 };
 

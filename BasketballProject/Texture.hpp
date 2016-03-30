@@ -11,7 +11,7 @@ public:
 
     ~Texture();
 
-    void render(int x, int y, SDL_Rect* clip = NULL);
+    void render(int x, int y, SDL_Rect* clip = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
     bool loadFromFile(std::string path);
 

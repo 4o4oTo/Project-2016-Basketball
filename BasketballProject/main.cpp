@@ -1,11 +1,14 @@
 #include "Texture.hpp"
 #include "main.hpp"
-#include "Button.hpp"
 #include "MusicButton.hpp"
 #include "MenuButton.hpp"
+#include "BlackPlayer.hpp"
+#include "BasketballPole.hpp"
 
-const int SCREEN_HEIGHT = 600;
-const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);
+const int AVG_FPS = 60;
+const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
 SDL_Window* gWindow = NULL;
 
@@ -13,8 +16,6 @@ SDL_Renderer* gRenderer = NULL;
 
 //Music
 Mix_Music* gMusic = NULL;
-Texture gMusicTexture;
-SDL_Rect gMusicClip[TOTAL_MUSIC_SPRITES];
 MusicButton gMusicButton;
 
 //Menu Background Texture
@@ -24,15 +25,18 @@ SDL_Rect gBackgroundClip;
 //Menu Buttons
 MenuButton gMenuButtons[TOTAL_MENU_BUTTONS];
 
-//Menu Texture
-Texture menuChoices[TOTAL_MENU_BUTTONS];
-
 //Font
 TTF_Font* gFont = NULL;
 
 //Court texture
 Texture gCourt;
 SDL_Rect gCourtClip;
+
+//Player
+BlackPlayer troy("Troy");
+
+//Entities
+BasketballPole gBasketballPole;
 
 bool init();
 
@@ -46,7 +50,17 @@ int main(int argc, char* argv[]) {
             bool quit = false;
             SDL_Event e;
             Mix_PlayMusic(gMusic, -1);
+            Uint8 prevTime = 0;
+            Uint8 currTime = 0;
+            Uint8 frameTime = 0;
+            Uint8 totalFrameTime = 0;
             while(!quit) {
+
+                prevTime = currTime;
+                currTime = SDL_GetTicks();
+                frameTime = currTime - prevTime;
+                totalFrameTime += frameTime;
+
                 while(SDL_PollEvent(&e) != 0) {
                     if(e.type == SDL_QUIT) {
                         quit = true;
@@ -56,14 +70,28 @@ int main(int argc, char* argv[]) {
                     }
 
                     gMusicButton.handleEvents(&e);
+
+                    if(gMenuButtons[PLAY].isClicked()) {
+                        troy.handleEvents(&e);
+                    }
                 }
 
                 SDL_RenderClear(gRenderer);
 
-                gMusicTexture.setColor(gMusicButton.getColor());
-
                 if(gMenuButtons[PLAY].isClicked()) {
+                    //try {
+                        while(totalFrameTime >= TIME_PER_FRAME) {
+                        troy.update();
+                        //troy.checkCollision(gBasketballPole.getX());
+                        totalFrameTime -= TIME_PER_FRAME;
+                    }
                     gCourt.render(0, 0, &gCourtClip);
+                    gBasketballPole.render();
+                    troy.render();
+                    //} catch () {
+
+                    //}
+
                 }
                 else if(gMenuButtons[OPTIONS].isClicked()) {
 
@@ -74,7 +102,7 @@ int main(int argc, char* argv[]) {
                     gBackgroundTexture.render(0, 0, &gBackgroundClip);
 
                     for(int j = 0; j < 3; j++) {
-                        gMenuButtons[j].render(&menuChoices[j]);
+                        gMenuButtons[j].render();
                     }
                 }
                 else {
@@ -82,12 +110,11 @@ int main(int argc, char* argv[]) {
                     gBackgroundTexture.render(0, 0, &gBackgroundClip);
 
                     for(int j = 0; j < 3; j++) {
-                        gMenuButtons[j].render(&menuChoices[j]);
+                        gMenuButtons[j].render();
                     }
-
                 }
 
-                gMusicButton.render(&gMusicTexture, &gMusicClip[gMusicButton.getCurrentSprite()]);
+                gMusicButton.render();
 
                 SDL_RenderPresent(gRenderer);
             }
@@ -105,13 +132,13 @@ bool init() {
         success = false;
     }
     else {
-        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
         if(gWindow == NULL) {
             printf("%s\n",SDL_GetError());
             success = false;
         }
         else {
-            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
             if(gRenderer == NULL) {
                 printf("%s\n",SDL_GetError());
                 success = false;
@@ -153,8 +180,8 @@ bool loadMedia() {
     else {
         gBackgroundClip.h = SCREEN_HEIGHT;
         gBackgroundClip.w = SCREEN_WIDTH;
-        gBackgroundClip.x = 450;
-        gBackgroundClip.y = 400;
+        gBackgroundClip.x = SCREEN_WIDTH*0.2;
+        gBackgroundClip.y = SCREEN_HEIGHT*0.4;
     }
 
     if(!gCourt.loadFromFile("background/court.png")) {
@@ -168,22 +195,14 @@ bool loadMedia() {
         gCourtClip.h = SCREEN_HEIGHT;
     }
 
-    if(!gMusicTexture.loadFromFile("music/icon.png")) {
+    if(!gMusicButton.loadTextureFromFile("music/icon.png")) {
         printf("%s\n", SDL_GetError());
         success = false;
     }
     else {
-        gMusicClip[UNMUTED].x = 0;
-        gMusicClip[UNMUTED].y = 0;
-        gMusicClip[UNMUTED].w = 40;
-        gMusicClip[UNMUTED].h = 70;
-
-        gMusicClip[MUTED].x = 40;
-        gMusicClip[MUTED].y = 0;
-        gMusicClip[MUTED].w = 40;
-        gMusicClip[MUTED].h = 70;
-
-        gMusicButton.setDimensions(50, 0, gMusicClip[MUTED].w, gMusicClip[MUTED].h);
+        gMusicButton.setClip(UNMUTED, 0, 0, 40, 70);
+        gMusicButton.setClip(MUTED, 40, 0, 40, 70);
+        gMusicButton.setDimensions(50, 0, 40, 70);
     }
 
     gMusic = Mix_LoadMUS("music/hustle.wav");
@@ -200,39 +219,70 @@ bool loadMedia() {
     else {
         SDL_Color textColor = {0, 0, 0};
         //Play
-        if(!menuChoices[PLAY].loadFromRenderedText("Play", textColor)) {
+        if(!gMenuButtons[PLAY].loadTextureFromText("Play", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[PLAY].setDimensions(430,30,menuChoices[PLAY].getWidth(),menuChoices[PLAY].getHeight());
+            gMenuButtons[PLAY].setDimensions(SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.16, gMenuButtons[PLAY].getWidth(), gMenuButtons[PLAY].getHeight());
             gMenuButtons[PLAY].setCurrentButton(PLAY);
         }
 
         //Options
-        if(!menuChoices[OPTIONS].loadFromRenderedText("Options", textColor)) {
+        if(!gMenuButtons[OPTIONS].loadTextureFromText("Options", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[OPTIONS].setDimensions(170,300,menuChoices[OPTIONS].getWidth(),menuChoices[OPTIONS].getHeight());
+            gMenuButtons[OPTIONS].setDimensions(SCREEN_WIDTH*0.25, SCREEN_HEIGHT*0.5, gMenuButtons[OPTIONS].getWidth(), gMenuButtons[OPTIONS].getHeight());
             gMenuButtons[OPTIONS].setCurrentButton(OPTIONS);
         }
 
         //Exit
-        if(!menuChoices[EXIT].loadFromRenderedText("Exit", textColor)) {
+        if(!gMenuButtons[EXIT].loadTextureFromText("Exit", textColor)) {
             success = false;
         }
         else {
-            gMenuButtons[EXIT].setDimensions(630,300,menuChoices[EXIT].getWidth(),menuChoices[EXIT].getHeight());
+            gMenuButtons[EXIT].setDimensions(SCREEN_WIDTH*0.59, SCREEN_HEIGHT*0.5, gMenuButtons[EXIT].getWidth(), gMenuButtons[EXIT].getHeight());
             gMenuButtons[EXIT].setCurrentButton(EXIT);
         }
     }
+
+    if(!gBasketballPole.getTexture().loadFromFile("entity/BasketballPole/BasketballPole.png")) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        gBasketballPole.setTextureRealDimensions(450,720);
+        gBasketballPole.setPosition(SCREEN_WIDTH - gBasketballPole.getTextureRealWidth() - (gBasketballPole.getTexture().getWidth()-gBasketballPole.getTextureRealWidth())/2, SCREEN_HEIGHT - gBasketballPole.getTexture().getHeight());
+    }
+
+    if(!troy.setNormalStance("player/NormalRunning/Run.1.png")) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        troy.setTextureRealDimensions(190,300);
+        troy.setInitialPosition((SCREEN_WIDTH - troy.getTextureRealWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
+        troy.setFacingDirection(RIGHT);
+        if(!troy.setDefenceStance("player/DefenceStance/DefenceStance.png")) {
+            printf("%s\n", SDL_GetError());
+        }
+        else {
+            troy.setDefenceScenes();
+        }
+        troy.setRunningScenes();
+        troy.setJumpingScenes();
+    }
+
     return success;
 }
 
 void shutdown() {
+    gMusicButton.free();
+    gCourt.free();
     gBackgroundTexture.free();
-    for(int i = 0; i<3; i++) {
-        menuChoices[i].free();
+    gBasketballPole.free();
+    for(int i=0; i<3; i++) {
+        gMenuButtons[i].free();
     }
 
     TTF_CloseFont(gFont);

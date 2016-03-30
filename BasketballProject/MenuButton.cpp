@@ -15,6 +15,10 @@ void MenuButton::click() {
     MenuButton::clicked = true;
 }
 
+void MenuButton::unclick() {
+    MenuButton::clicked = false;
+}
+
 void MenuButton::handleEvents(SDL_Event* e) {
     if(e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONUP) {
         int x, y;
@@ -59,5 +63,8 @@ void MenuButton::handleEvents(SDL_Event* e) {
                     break;
             }
         }
+    }
+    if(e->key.keysym.sym == SDLK_ESCAPE) {
+        unclick();
     }
 }

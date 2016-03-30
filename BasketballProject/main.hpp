@@ -6,6 +6,7 @@
 #include <SDL_ttf.h>
 #include <stdio.h>
 #include <SDL_mixer.h>
+#include <windows.h>
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;

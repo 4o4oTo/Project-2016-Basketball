@@ -4,8 +4,11 @@ MusicButton::MusicButton() : Button::Button() {
     MusicButton::currentSprite = UNMUTED;
 }
 
-MusicSprite MusicButton::getCurrentSprite() {
-    return MusicButton::currentSprite;
+void MusicButton::setClip(MusicSprite sprite, int x, int y, int w, int h) {
+    MusicButton::sprites[sprite].x = x;
+    MusicButton::sprites[sprite].y = y;
+    MusicButton::sprites[sprite].w = w;
+    MusicButton::sprites[sprite].h = h;
 }
 
 void MusicButton::handleEvents(SDL_Event* e) {
@@ -51,6 +54,7 @@ void MusicButton::handleEvents(SDL_Event* e) {
                     break;
             }
         }
-
+    MusicButton::_BTexture.setColor(MusicButton::_BColor);
+    MusicButton::_BClip = MusicButton::sprites[MusicButton::currentSprite];
     }
 }

@@ -77,13 +77,13 @@ std::string Texture::getText() {
     return Texture::_Text;
 }
 
-void Texture::render(int x, int y, SDL_Rect* clip) {
+void Texture::render(int x, int y, SDL_Rect* clip, SDL_RendererFlip flip) {
     SDL_Rect renderQuad = {x, y, Texture::_TWidth, Texture::_THeight};
     if(clip != NULL) {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;
     }
-    SDL_RenderCopy(gRenderer, Texture::_Texture, clip, &renderQuad);
+    SDL_RenderCopyEx(gRenderer, Texture::_Texture, clip, &renderQuad, 0.0, NULL, flip);
 }
 
 void Texture::free() {

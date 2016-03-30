@@ -11,12 +11,13 @@ enum MusicSprite {
 
 class MusicButton : public Button {
     MusicSprite currentSprite;
+    SDL_Rect sprites[TOTAL_MUSIC_SPRITES];
 public:
     MusicButton();
 
     void handleEvents(SDL_Event* e);
 
-    MusicSprite getCurrentSprite();
+    void setClip(MusicSprite sprite, int x, int y, int w, int h);
 
 };
 

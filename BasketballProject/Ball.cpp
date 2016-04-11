@@ -42,7 +42,13 @@ void Ball::setPosition(int x, int y) {
 }
 
 void Ball::render() {
-    bTexture.render(bBall.x, bBall.y);
+    if(!possessed) {
+        bTexture.render(bBall.x, bBall.y);
+    }
+}
+
+void Ball::hide() {
+    bTexture.render(-bTexture.getWidth(), SCREEN_HEIGHT - bTexture.getHeight());
 }
 
 void Ball::update() {

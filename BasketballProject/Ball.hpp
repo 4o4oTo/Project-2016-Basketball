@@ -34,6 +34,8 @@ public:
 
     void setPossession(bool possession);
 
+    void hide();
+
     bool isPossessed();
 };
 

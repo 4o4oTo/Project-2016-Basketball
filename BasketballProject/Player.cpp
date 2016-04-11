@@ -305,9 +305,14 @@ void Player::checkBasketballPoleCollision(BasketballPole* pole) {
 }
 
 void Player::checkBallCollision(Ball* ball) {
-    if(pPos.x + getTextureRealWidth() >= ball->getX() && pPos.x <= ball->getX() + ball->getTexture().getWidth() && pPos.y <= ball->getY()) {
+    if(pPos.x + getTextureRealWidth() >= ball->getX() && pPos.x + getTextureRealWidth() <= ball->getX() + ball->getTexture().getWidth() && pPos.y <= ball->getY() && !hasTheBall) {
         hasTheBall = true;
         ball->setPossession(true);
+        ball->hide();
+        ball->setPosition(pPos.x, pPos.y);
+    }
+    else if (hasTheBall) {
+        ball->setPosition(pPos.x, pPos.y);
     }
 }
 

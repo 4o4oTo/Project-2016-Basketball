@@ -44,6 +44,8 @@
 			<Add directory="D:/GAMES/CodeBlocksProjects/TTF_dev_lib/lib" />
 			<Add directory="D:/GAMES/CodeBlocksProjects/SDL_Mixer/lib" />
 		</Linker>
+		<Unit filename="Ball.cpp" />
+		<Unit filename="Ball.hpp" />
 		<Unit filename="BasketballPole.cpp" />
 		<Unit filename="BasketballPole.hpp" />
 		<Unit filename="BlackPlayer.cpp" />

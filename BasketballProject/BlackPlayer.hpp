@@ -7,6 +7,8 @@
 #define RUNNING 18
 #define DEFENDING 13
 #define JUMPING 6
+#define DRIBBLING 21
+#define STANDDRIBBLE 22
 
 class BlackPlayer : public Player {
     int frameTime;
@@ -14,6 +16,8 @@ class BlackPlayer : public Player {
     Texture runningTextures[RUNNING];
     Texture defenceTextures[DEFENDING];
     Texture jumpingTextures[JUMPING];
+    Texture dribblingTextures[DRIBBLING];
+    Texture standDribbleTextures[STANDDRIBBLE];
 public:
     BlackPlayer(std::string name);
 
@@ -24,6 +28,10 @@ public:
     void setDefenceScenes();
 
     void setJumpingScenes();
+
+    void setDribblingScenes();
+
+    void setStandDribbleScenes();
 
     void update();
 };

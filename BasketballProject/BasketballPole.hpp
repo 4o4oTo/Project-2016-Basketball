@@ -6,17 +6,25 @@
 class BasketballPole {
     SDL_Rect polePos;
     Texture poleTexture;
-    int textureRealHeight, textureRealWidth;
+    SDL_Rect board;
+    SDL_Rect belowBoard;
+    SDL_Rect rim;
 public:
     BasketballPole();
 
     void setPosition(int x, int y);
 
-    void setTextureRealDimensions(int w, int h);
+    void setDimensionsBelowBoard(int x, int y, int w, int h);
 
-    int getTextureRealHeight();
+    void setBoardDimensions(int x, int y, int w, int h);
 
-    int getTextureRealWidth();
+    void setRimDimensions(int x, int y, int w, int h);
+
+    SDL_Rect& getBoard();
+
+    SDL_Rect& getRim();
+
+    SDL_Rect& getBelowBoard();
 
     int getX();
 

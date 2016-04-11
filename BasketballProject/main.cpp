@@ -4,6 +4,7 @@
 #include "MenuButton.hpp"
 #include "BlackPlayer.hpp"
 #include "BasketballPole.hpp"
+#include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
 const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);
@@ -37,6 +38,7 @@ BlackPlayer troy("Troy");
 
 //Entities
 BasketballPole gBasketballPole;
+Ball gBall(-4);
 
 bool init();
 
@@ -79,19 +81,16 @@ int main(int argc, char* argv[]) {
                 SDL_RenderClear(gRenderer);
 
                 if(gMenuButtons[PLAY].isClicked()) {
-                    //try {
-                        while(totalFrameTime >= TIME_PER_FRAME) {
+                    while(totalFrameTime >= TIME_PER_FRAME) {
                         troy.update();
-                        //troy.checkCollision(gBasketballPole.getX());
+                        troy.checkBallCollision(&gBall);
+                        troy.checkBasketballPoleCollision(&gBasketballPole);
                         totalFrameTime -= TIME_PER_FRAME;
                     }
                     gCourt.render(0, 0, &gCourtClip);
                     gBasketballPole.render();
+                    gBall.render();
                     troy.render();
-                    //} catch () {
-
-                    //}
-
                 }
                 else if(gMenuButtons[OPTIONS].isClicked()) {
 
@@ -251,8 +250,24 @@ bool loadMedia() {
         success = false;
     }
     else {
-        gBasketballPole.setTextureRealDimensions(450,720);
-        gBasketballPole.setPosition(SCREEN_WIDTH - gBasketballPole.getTextureRealWidth() - (gBasketballPole.getTexture().getWidth()-gBasketballPole.getTextureRealWidth())/2, SCREEN_HEIGHT - gBasketballPole.getTexture().getHeight());
+        gBasketballPole.setBoardDimensions(0, 0, 120,240);
+        gBasketballPole.setDimensionsBelowBoard(0, gBasketballPole.getBoard().y + gBasketballPole.getBoard().h, 120,495);
+        gBasketballPole.setRimDimensions(0, 220, 90, 10);
+        gBasketballPole.setPosition(SCREEN_WIDTH -
+                                    gBasketballPole.getBoard().w -
+                                    (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2,
+                                    SCREEN_HEIGHT - gBasketballPole.getTexture().getHeight());
+        gBasketballPole.getBoard().x = gBasketballPole.getX() + (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2 - gBasketballPole.getBoard().w - 100;
+        gBasketballPole.getBelowBoard().x = SCREEN_WIDTH - gBasketballPole.getBelowBoard().w;
+        gBasketballPole.getRim().x = gBasketballPole.getBoard().x - gBasketballPole.getRim().w;
+    }
+
+    if(!gBall.getTexture().loadFromFile("entity/Basketball/Ball.png")) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        gBall.setPosition(100, SCREEN_HEIGHT - gBall.getTexture().getHeight());
     }
 
     if(!troy.setNormalStance("player/NormalRunning/Run.1.png")) {
@@ -260,17 +275,16 @@ bool loadMedia() {
         success = false;
     }
     else {
-        troy.setTextureRealDimensions(190,300);
-        troy.setInitialPosition((SCREEN_WIDTH - troy.getTextureRealWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
+        troy.setTextureRealDimensions(100,290);
+        troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
         troy.setFacingDirection(RIGHT);
-        if(!troy.setDefenceStance("player/DefenceStance/DefenceStance.png")) {
-            printf("%s\n", SDL_GetError());
-        }
-        else {
+        if(troy.setDefenceStance("player/DefenceStance/DefenceStance.png")) {
             troy.setDefenceScenes();
         }
         troy.setRunningScenes();
         troy.setJumpingScenes();
+        troy.setDribblingScenes();
+        troy.setStandDribbleScenes();
     }
 
     return success;

@@ -3,7 +3,7 @@
 BlackPlayer::BlackPlayer(std::string name) : Player::Player(name) {
     frameTime = 2;
     currFrameTime = 0;
-    pJumpPower = -6.5;
+    pJumpPower = -10;
     pMovementSpeed = 10;
 }
 
@@ -11,7 +11,7 @@ void BlackPlayer::update() {
 
     processInput();
 
-    if(isRunning && !isDefending) {
+    if(isRunning && !isDefending && !hasTheBall) {
 
         if(currFrameTime == frameTime) {
             frame++;
@@ -25,8 +25,7 @@ void BlackPlayer::update() {
         }
         pTexture = runningTextures[frame];
     }
-    else if(isRunning && isDefending) {
-        printf("%d\n",frame);
+    else if(isRunning && isDefending && !hasTheBall) {
         if(currFrameTime == frameTime) {
             frame++;
             currFrameTime = 0;
@@ -43,14 +42,14 @@ void BlackPlayer::update() {
             positioned = true;
         }
     }
-    else if(isDefending && isStanding) {
+    else if(isDefending && isStanding && !hasTheBall) {
         pTexture = pDefenceStance;
         if(!positioned) {
             pPos.y += 20;
             positioned = true;
         }
     }
-    else if(isJumping) {
+    else if(isJumping && !hasTheBall) {
         if(currFrameTime == frameTime) {
             frame++;
             currFrameTime = 0;
@@ -62,6 +61,32 @@ void BlackPlayer::update() {
             frame=JUMPING-1;
         }
         pTexture = jumpingTextures[frame];
+    }
+    else if(hasTheBall && isStanding) {
+        if(currFrameTime == frameTime) {
+            frame++;
+            currFrameTime = 0;
+        }
+        else {
+            currFrameTime++;
+        }
+        if(isLastFrame(STANDDRIBBLE)) {
+            frame = 0;
+        }
+        pTexture = standDribbleTextures[frame];
+    }
+    else if(hasTheBall && isRunning) {
+        if(currFrameTime == frameTime) {
+            frame++;
+            currFrameTime = 0;
+        }
+        else {
+            currFrameTime++;
+        }
+        if(isLastFrame(DRIBBLING)) {
+            frame = 0;
+        }
+        pTexture = dribblingTextures[frame];
     }
 
 }
@@ -85,6 +110,22 @@ void BlackPlayer::setDefenceScenes() {
 void BlackPlayer::setJumpingScenes() {
     for(int i=0; i<JUMPING ; i++) {
         if(!jumpingTextures[i].loadFromFile("player/Jump/Jump_" + std::to_string(i+1) + ".png")) {
+            printf("%s\n", SDL_GetError());
+        }
+    }
+}
+
+void BlackPlayer::setDribblingScenes() {
+    for(int i=0; i<DRIBBLING; i++) {
+        if(!dribblingTextures[i].loadFromFile("player/Dribble/Dribble_" + std::to_string(i+1) + ".png")) {
+            printf("%s\n", SDL_GetError());
+        }
+    }
+}
+
+void BlackPlayer::setStandDribbleScenes() {
+    for(int i=0; i<STANDDRIBBLE; i++) {
+        if(!standDribbleTextures[i].loadFromFile("player/StandingDribble/Dribble_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }

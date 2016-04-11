@@ -3,6 +3,8 @@
 
 #include "main.hpp"
 #include "Texture.hpp"
+#include "BasketballPole.hpp"
+#include "Ball.hpp"
 
 enum FacingDirection {
     RIGHT = 0,
@@ -33,6 +35,9 @@ protected:
     float pVelY;
     int textureRealHeight, textureRealWidth;
     float pMovementSpeed;
+    bool behindRim;
+    bool belowRim;
+    bool hasTheBall;
 public:
     Player(std::string name);
 
@@ -46,11 +51,25 @@ public:
 
     void setInitialPosition(int x, int y);
 
+    void setBehindRim(bool behind);
+
+    void setBelowRim(bool below);
+
+    void setBallPossession(bool possession);
+
     void processInput();
+
+    bool isBelowRim();
+
+    bool isBehindRim();
+
+    bool hasBall();
+
+    bool isJumpin();
 
     bool isLastFrame(int frames_count);
 
-    void checkCollision(int collider = 0);
+    void checkCollision(int x = 0, int y = 0);
 
     void setFacingDirection(FacingDirection dir);
 
@@ -65,6 +84,10 @@ public:
     int getTextureRealHeight();
 
     int getTextureRealWidth();
+
+    void checkBasketballPoleCollision(BasketballPole* pole);
+
+    void checkBallCollision(Ball* ball);
 
     int getX();
 

@@ -35,13 +35,19 @@ bool Texture::loadFromFile(std::string path) {
     return (Texture::_Texture != NULL);
 }
 
-bool Texture::loadFromRenderedText(std::string textureText, SDL_Color textColor) {
+bool Texture::loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* font) {
     //Dispose of previously loaded textures
     Texture::free();
 
     Texture::_Text = textureText;
     //Render passed string
-    SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+    SDL_Surface* textSurface = NULL;
+    if(font != NULL) {
+        textSurface = TTF_RenderText_Solid(font, textureText.c_str(), textColor);
+    }
+    else {
+        textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+    }
     if(textSurface == NULL) {
         printf("Failed to load rendered text! TTF_Error: %s\n", TTF_GetError());
     }

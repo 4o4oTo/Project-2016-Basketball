@@ -15,7 +15,7 @@ public:
 
     bool loadFromFile(std::string path);
 
-    bool loadFromRenderedText(std::string str, SDL_Color color);
+    bool loadFromRenderedText(std::string str, SDL_Color color, TTF_Font* font = NULL);
 
     std::string getText();
 

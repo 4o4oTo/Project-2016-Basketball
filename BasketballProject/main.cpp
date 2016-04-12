@@ -38,7 +38,7 @@ BlackPlayer troy("Troy");
 
 //Entities
 BasketballPole gBasketballPole;
-Ball gBall(-4);
+Ball gBall(4);
 
 bool init();
 
@@ -75,6 +75,7 @@ int main(int argc, char* argv[]) {
 
                     if(gMenuButtons[PLAY].isClicked()) {
                         troy.handleEvents(&e);
+                        gBall.handleEvents(&e);
                     }
                 }
 
@@ -83,7 +84,8 @@ int main(int argc, char* argv[]) {
                 if(gMenuButtons[PLAY].isClicked()) {
                     while(totalFrameTime >= TIME_PER_FRAME) {
                         troy.update();
-                        troy.checkBallCollision(&gBall);
+                        gBall.update();
+                        troy.checkBallCollision();
                         troy.checkBasketballPoleCollision(&gBasketballPole);
                         totalFrameTime -= TIME_PER_FRAME;
                     }
@@ -243,6 +245,8 @@ bool loadMedia() {
             gMenuButtons[EXIT].setDimensions(SCREEN_WIDTH*0.59, SCREEN_HEIGHT*0.5, gMenuButtons[EXIT].getWidth(), gMenuButtons[EXIT].getHeight());
             gMenuButtons[EXIT].setCurrentButton(EXIT);
         }
+
+
     }
 
     if(!gBasketballPole.getTexture().loadFromFile("entity/BasketballPole/BasketballPole.png")) {
@@ -285,6 +289,8 @@ bool loadMedia() {
         troy.setJumpingScenes();
         troy.setDribblingScenes();
         troy.setStandDribbleScenes();
+        troy.setShootingScenes();
+        troy.passTheBall(&gBall);
     }
 
     return success;

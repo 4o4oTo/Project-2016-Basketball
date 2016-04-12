@@ -10,11 +10,14 @@ class Ball {
     SDL_Point bBall;
     Texture bTexture;
     bool possessed;
+    bool thrown;
     float bVelX;
     float bVelY;
+    float bMaxPower;
+    float bInitialY;
 public:
 
-    Ball(float power);
+    Ball(float bounce);
 
     ~Ball();
 
@@ -26,6 +29,10 @@ public:
 
     void setPosition(int x, int y);
 
+    void processInput();
+
+    void handleEvents(SDL_Event* e);
+
     void update();
 
     void checkCollision(int x = 0, int y = 0);
@@ -34,7 +41,9 @@ public:
 
     void setPossession(bool possession);
 
-    void hide();
+    void setIsThrown(bool t);
+
+    bool isThrown();
 
     bool isPossessed();
 };

@@ -21,7 +21,7 @@ protected:
     bool hasLanded;
     bool isStanding;
     bool isJumping;
-    int pMaxJumpHeight;
+    bool hasThrownTheBall;
     int frame;
     bool positioned;
     std::string pName;
@@ -38,6 +38,8 @@ protected:
     bool behindRim;
     bool belowRim;
     bool hasTheBall;
+    bool hadTheBallBeforeJump;
+    Ball* ball;
 public:
     Player(std::string name);
 
@@ -50,6 +52,8 @@ public:
     virtual void update() = 0;
 
     void setInitialPosition(int x, int y);
+
+    void passTheBall(Ball* b);
 
     void setBehindRim(bool behind);
 
@@ -87,7 +91,7 @@ public:
 
     void checkBasketballPoleCollision(BasketballPole* pole);
 
-    void checkBallCollision(Ball* ball);
+    void checkBallCollision();
 
     int getX();
 

@@ -1,8 +1,8 @@
 # depslib dependency file v1.0
-1460398127 source:d:\games\codeblocksprojects\basketballproject\texture.cpp
+1460624878 source:d:\games\codeblocksprojects\basketballproject\texture.cpp
 	"Texture.hpp"
 
-1460448573 source:d:\games\codeblocksprojects\basketballproject\main.cpp
+1460673619 source:d:\games\codeblocksprojects\basketballproject\main.cpp
 	"Texture.hpp"
 	"main.hpp"
 	"MusicButton.hpp"
@@ -11,7 +11,7 @@
 	"BasketballPole.hpp"
 	"Ball.hpp"
 
-1460397445 d:\games\codeblocksprojects\basketballproject\texture.hpp
+1460624811 d:\games\codeblocksprojects\basketballproject\texture.hpp
 	"main.hpp"
 
 1451803974 d:\games\codeblocksprojects\mingw32_dev_lib\include\sdl2\sdl_image.h
@@ -386,7 +386,7 @@
 1458770518 source:d:\games\codeblocksprojects\basketballproject\troy.cpp
 	"Troy.hpp"
 
-1460451978 source:d:\games\codeblocksprojects\basketballproject\player.cpp
+1460711241 source:d:\games\codeblocksprojects\basketballproject\player.cpp
 	"Player.hpp"
 
 1460445706 d:\games\codeblocksprojects\basketballproject\player.hpp
@@ -413,10 +413,11 @@
 	"main.hpp"
 	"Texture.hpp"
 
-1460452564 source:d:\games\codeblocksprojects\basketballproject\ball.cpp
+1460711782 source:d:\games\codeblocksprojects\basketballproject\ball.cpp
 	"Ball.hpp"
 
-1460449445 d:\games\codeblocksprojects\basketballproject\ball.hpp
+1460710297 d:\games\codeblocksprojects\basketballproject\ball.hpp
 	"main.hpp"
 	"Texture.hpp"
+	"BasketballPole.hpp"
 

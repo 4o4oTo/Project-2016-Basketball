@@ -7,7 +7,7 @@
 #include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
-const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) - 200;
 const int AVG_FPS = 60;
 const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
@@ -89,9 +89,10 @@ int main(int argc, char* argv[]) {
                         troy.checkBasketballPoleCollision(&gBasketballPole);
                         totalFrameTime -= TIME_PER_FRAME;
                     }
+                    gBall.checkCollisionWithPole();
                     gCourt.render(0, 0, &gCourtClip);
-                    gBasketballPole.render();
                     gBall.render();
+                    gBasketballPole.render();
                     troy.render();
                 }
                 else if(gMenuButtons[OPTIONS].isClicked()) {
@@ -133,7 +134,7 @@ bool init() {
         success = false;
     }
     else {
-        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN); //SDL_WINDOW_FULLSCREEN_DESKTOP);
         if(gWindow == NULL) {
             printf("%s\n",SDL_GetError());
             success = false;
@@ -255,13 +256,13 @@ bool loadMedia() {
     }
     else {
         gBasketballPole.setBoardDimensions(0, 0, 120,240);
-        gBasketballPole.setDimensionsBelowBoard(0, gBasketballPole.getBoard().y + gBasketballPole.getBoard().h, 120,495);
-        gBasketballPole.setRimDimensions(0, 220, 90, 10);
+        gBasketballPole.setDimensionsBelowBoard(0, gBasketballPole.getBoard().y + gBasketballPole.getBoard().h, 40,495);
+        gBasketballPole.setRimDimensions(0, 220, 100, 10);
         gBasketballPole.setPosition(SCREEN_WIDTH -
                                     gBasketballPole.getBoard().w -
                                     (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2,
                                     SCREEN_HEIGHT - gBasketballPole.getTexture().getHeight());
-        gBasketballPole.getBoard().x = gBasketballPole.getX() + (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2 - gBasketballPole.getBoard().w - 100;
+        gBasketballPole.getBoard().x = gBasketballPole.getX() + (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2 - gBasketballPole.getBoard().w + 20;
         gBasketballPole.getBelowBoard().x = SCREEN_WIDTH - gBasketballPole.getBelowBoard().w;
         gBasketballPole.getRim().x = gBasketballPole.getBoard().x - gBasketballPole.getRim().w;
     }
@@ -272,6 +273,7 @@ bool loadMedia() {
     }
     else {
         gBall.setPosition(100, SCREEN_HEIGHT - gBall.getTexture().getHeight());
+        gBall.passThePole(&gBasketballPole);
     }
 
     if(!troy.setNormalStance("player/NormalRunning/Run.1.png")) {

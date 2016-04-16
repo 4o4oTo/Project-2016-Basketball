@@ -118,6 +118,10 @@ void Ball::processInput() {
 void Ball::update() {
     processInput();
 
+    if(possessed && hitBoard) {
+        hitBoard = false;
+    }
+
     if(thrown && !possessed) {
         if(bBall.y + bTexture.getHeight() > bInitialY + bTexture.getHeight()) {
             checkCollision(0, bInitialY + bTexture.getHeight());
@@ -149,7 +153,7 @@ void Ball::update() {
 }
 
 void Ball::checkCollisionWithPole() {
-    if(bBall.x + bTexture.getWidth() <= pole->getRim().x) {
+    if(bBall.x + bTexture.getWidth() < pole->getRim().x) {
         beforeRim = true;
         behindRim = false;
     }
@@ -157,27 +161,38 @@ void Ball::checkCollisionWithPole() {
         behindRim = true;
         beforeRim = false;
     }
+    else {
+        behindRim = false;
+        beforeRim = false;
+    }
     if(bBall.y + bTexture.getHeight() < pole->getRim().y) {
         aboveRim = true;
         sameLvlAsRim = false;
         belowRim = false;
     }
-    else if(bBall.y <= pole->getRim().y && bBall.y + bTexture.getHeight() >= pole->getRim().y + pole->getRim().h && !hitBoard) {
+    else if(bBall.y <= pole->getRim().y && bBall.y + bTexture.getHeight() >= pole->getRim().y + pole->getRim().h) {
         sameLvlAsRim = true;
         aboveRim = false;
         belowRim = false;
     }
-    else if(bBall.y > pole->getRim().y + bTexture.getHeight() ) {
+    else if(bBall.y > pole->getRim().y + bTexture.getHeight()) {
         belowRim = true;
         aboveRim = false;
         sameLvlAsRim = false;
     }
-
     if(aboveRim) {
         checkCollision(pole->getBoard().x);
     }
-    else if(sameLvlAsRim && beforeRim) {
+    else if(sameLvlAsRim && bBall.x + 2*bTexture.getWidth()/3 <= pole->getRim().x && !hitBoard) {
         checkCollision(pole->getRim().x);
+    }
+    else if(sameLvlAsRim && !beforeRim && !behindRim) {
+        if(bBall.x < pole->getRim().x && bBall.x + bTexture.getWidth() > pole->getRim().x) {
+            checkCollision(-(pole->getRim().x), pole->getRim().y);
+        }
+        else if(bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w - 5) {
+            checkCollision(pole->getRim().x + pole->getRim().w - 5, pole->getRim().y);
+        }
     }
     else if(belowRim && behindRim) {
         checkCollision(pole->getBelowBoard().x, -pole->getBelowBoard().y);
@@ -185,12 +200,10 @@ void Ball::checkCollisionWithPole() {
 }
 
 void Ball::checkCollision(int x, int y) {
-    //printf("%f X VEL\n", bVelX);
-    //printf("%f Y VEL\n", bVelY);
     if(bBall.x <= 0) {
         bBall.x = 0;
-        bVelX = -bVelX/2;
-        bVelY = bVelY/2;
+        bVelX = -bVelX;
+        bVelY = bVelY;
         rotationAngle = -rotationAngle;
     }
     else if(x != 0 && y == 0) {
@@ -203,8 +216,8 @@ void Ball::checkCollision(int x, int y) {
                     hitBoard = false;
                 }
                 bBall.x = x - bTexture.getWidth();
-                bVelX = -bVelX/2;
-                bVelY = bVelY/2;
+                bVelX = -bVelX/1.5;
+                bVelY = bVelY/1.5;
                 rotationAngle = -rotationAngle;
             }
         }
@@ -212,8 +225,8 @@ void Ball::checkCollision(int x, int y) {
             x = -x;
             if(bBall.x <= x) {
                 bBall.x = x;
-                bVelX = -bVelX/2;
-                bVelY = bVelY/2;
+                bVelX = -bVelX/1.5;
+                bVelY = bVelY/1.5;
                 rotationAngle = -rotationAngle;
             }
         }
@@ -223,7 +236,7 @@ void Ball::checkCollision(int x, int y) {
         if(y > 0) {
             if(bBall.y + bTexture.getHeight() > y) {
                 bBall.y  = y - bTexture.getHeight();
-                bVelY = -bVelY/2;
+                bVelY = -bVelY/1.5;
                 if(firstRotation) {
                     rotationAngle = -rotationAngle;
                     firstRotation = false;
@@ -234,7 +247,7 @@ void Ball::checkCollision(int x, int y) {
             y = -y;
             if(bBall.y < y) {
                 bBall.y = y;
-                bVelY = -bVelY/2;
+                bVelY = -bVelY/1.5;
                 if(firstRotation) {
                     rotationAngle = -rotationAngle;
                     firstRotation = false;
@@ -246,7 +259,7 @@ void Ball::checkCollision(int x, int y) {
         if(y > 0) {
             if(bBall.y + bTexture.getHeight() > y) {
                 bBall.y  = y - bTexture.getHeight();
-                bVelY = -bVelY/2;
+                bVelY = -bVelY/1.5;
                 if(firstRotation) {
                     rotationAngle = -rotationAngle;
                     firstRotation = false;
@@ -257,7 +270,7 @@ void Ball::checkCollision(int x, int y) {
             y = -y;
             if(bBall.y < y) {
                 bBall.y = y;
-                bVelY = -bVelY/2;
+                bVelY = -bVelY/1.5;
                 if(firstRotation) {
                     rotationAngle = -rotationAngle;
                     firstRotation = false;
@@ -273,8 +286,8 @@ void Ball::checkCollision(int x, int y) {
                     hitBoard = false;
                 }
                 bBall.x = x - bTexture.getWidth();
-                bVelX = -bVelX/2;
-                bVelY = bVelY/2;
+                bVelX = -bVelX/1.5;
+                bVelY = bVelY/1.5;
                 rotationAngle = -rotationAngle;
             }
         }
@@ -282,8 +295,8 @@ void Ball::checkCollision(int x, int y) {
             x = -x;
             if(bBall.x <= x) {
                 bBall.x = x;
-                bVelX = -bVelX/2;
-                bVelY = bVelY/2;
+                bVelX = -bVelX/1.5;
+                bVelY = bVelY/1.5;
                 rotationAngle = -rotationAngle;
             }
         }

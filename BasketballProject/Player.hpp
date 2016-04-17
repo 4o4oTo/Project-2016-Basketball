@@ -23,6 +23,7 @@ protected:
     bool isJumping;
     bool hasThrownTheBall;
     int frame;
+    int currFrameTime;
     bool positioned;
     std::string pName;
     Texture pTexture;

@@ -2,7 +2,7 @@
 
 BlackPlayer::BlackPlayer(std::string name) : Player::Player(name) {
     frameTime = 2;
-    currFrameTime = 0;
+    //currFrameTime = 0;
     pJumpPower = -10;
     pMovementSpeed = 10;
 }

@@ -12,6 +12,7 @@ class Ball {
     Texture bTexture;
     bool possessed;
     bool thrown;
+    bool collidedWithPole;
     bool hitBoard;
     bool sameLvlAsRim;
     bool aboveRim;
@@ -41,6 +42,8 @@ public:
 
     void setPosition(int x, int y);
 
+    void setHasCollidedWithThePole(bool b);
+
     void processInput();
 
     void handleEvents(SDL_Event* e);
@@ -60,6 +63,8 @@ public:
     void setVelocity(float xVel, float yVel);
 
     bool isThrown();
+
+    bool hasCollidedWithThePole();
 
     bool isPossessed();
 };

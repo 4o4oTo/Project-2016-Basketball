@@ -10,6 +10,7 @@ Ball::Ball(float bounce) : bGravity(0.3){
     aboveRim = false;
     belowRim = true;
     hitBoard = false;
+    collidedWithPole = false;
     behindRim = false;
     beforeRim = true;
     firstRotation = true;
@@ -31,12 +32,20 @@ void Ball::passThePole(BasketballPole* p) {
     pole = p;
 }
 
+void Ball::setHasCollidedWithThePole(bool b) {
+    collidedWithPole = b;
+}
+
 void Ball::setPossession(bool possession) {
     possessed = possession;
 }
 
 bool Ball::isPossessed() {
     return possessed;
+}
+
+bool Ball::hasCollidedWithThePole() {
+    return collidedWithPole;
 }
 
 void Ball::setIsThrown(bool t) {
@@ -73,10 +82,11 @@ void Ball::handleEvents(SDL_Event* e) {
     if(e->type == SDL_KEYDOWN) {
         switch(e->key.keysym.sym) {
             case SDLK_r:
-                if(possessed && !thrown && bVelX == 0 && bVelY == 0) {
+                if(possessed && !thrown && bVelX == 0.0 && bVelY == 0.0) {
                     bVelX = bouncePower;
                     bVelY = -bouncePower;
                     firstRotation = true;
+                    rotationAngle = 0.0;
                 }
                 break;
         }
@@ -89,12 +99,12 @@ void Ball::handleEvents(SDL_Event* e) {
 
 void Ball::render() {
     if(!possessed) {
-        if(thrown) {
+        //if(thrown) {
             bTexture.render(bBall.x, bBall.y, NULL, SDL_FLIP_NONE, rotationAngle);
-        }
-        else {
-            bTexture.render(bBall.x, bBall.y);
-        }
+//        }
+//        else {
+//            bTexture.render(bBall.x, bBall.y);
+//        }
     }
 }
 
@@ -133,16 +143,15 @@ void Ball::update() {
             rotationAngle -= 8;
         }
         bVelY += bGravity*1.5;
-        if(bVelX > 0) {
+        if(bVelX - bGravity/15 > 1) {
             bVelX -= bGravity/15;
         }
-        else if(bVelX < 0) {
+        else if(bVelX + bGravity/15 < 1) {
             bVelX += bGravity/15;
         }
-        if(bVelX == 0.0 && bVelY == 0.0) {
+        if((abs(bVelX-0.0) < 0.00001) && (abs(bVelY-0.0) < 0.00001) && bBall.y >= bInitialY) {
             bBall.y = bInitialY;
             thrown = false;
-            rotationAngle = 0.0;
         }
         else {
             bBall.x += bVelX;
@@ -183,19 +192,24 @@ void Ball::checkCollisionWithPole() {
     if(aboveRim) {
         checkCollision(pole->getBoard().x);
     }
-    else if(sameLvlAsRim && bBall.x + 2*bTexture.getWidth()/3 <= pole->getRim().x && !hitBoard) {
+    else if(sameLvlAsRim && bBall.x + 2*bTexture.getWidth()/3 <= pole->getRim().x && !hitBoard && thrown) {
         checkCollision(pole->getRim().x);
     }
     else if(sameLvlAsRim && !beforeRim && !behindRim) {
-        if(bBall.x < pole->getRim().x && bBall.x + bTexture.getWidth() > pole->getRim().x) {
+        if(bBall.x <= pole->getRim().x && bBall.x + bTexture.getWidth() >= pole->getRim().x && bBall.y <= pole->getRim().y && hitBoard) {
+            printf("LEFT SIDE\n", bBall.x);
             checkCollision(-(pole->getRim().x), pole->getRim().y);
         }
-        else if(bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w - 5) {
-            checkCollision(pole->getRim().x + pole->getRim().w - 5, pole->getRim().y);
+        else if(bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w && bBall.y <= pole->getRim().y) {
+            printf("RIGHT SIDE\n", pole->getRim().x);
+            checkCollision(pole->getRim().x + pole->getRim().w, pole->getRim().y);
         }
     }
     else if(belowRim && behindRim) {
         checkCollision(pole->getBelowBoard().x, -pole->getBelowBoard().y);
+    }
+    else{
+        checkCollision();
     }
 }
 
@@ -203,7 +217,6 @@ void Ball::checkCollision(int x, int y) {
     if(bBall.x <= 0) {
         bBall.x = 0;
         bVelX = -bVelX;
-        bVelY = bVelY;
         rotationAngle = -rotationAngle;
     }
     else if(x != 0 && y == 0) {
@@ -215,18 +228,30 @@ void Ball::checkCollision(int x, int y) {
                 else {
                     hitBoard = false;
                 }
+                if(x == pole->getBoard().x || x == pole->getRim().x) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
-                bVelY = bVelY/1.5;
+                bVelY = bVelY/1.2;
                 rotationAngle = -rotationAngle;
             }
         }
         else {
             x = -x;
             if(bBall.x <= x) {
+                if(x == pole->getRim().x + pole->getRim().w - 5) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;
-                bVelY = bVelY/1.5;
+                bVelY = bVelY/1.2;
                 rotationAngle = -rotationAngle;
             }
         }
@@ -235,6 +260,12 @@ void Ball::checkCollision(int x, int y) {
     else if(x == 0 && y != 0) {
         if(y > 0) {
             if(bBall.y + bTexture.getHeight() > y) {
+                if(y == pole->getRim().y) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.y  = y - bTexture.getHeight();
                 bVelY = -bVelY/1.5;
                 if(firstRotation) {
@@ -245,7 +276,13 @@ void Ball::checkCollision(int x, int y) {
         }
         else {
             y = -y;
-            if(bBall.y < y) {
+            if(bBall.y <= y) {
+                if(y == pole->getRim().y || y == pole->getBelowBoard().y) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
                 if(firstRotation) {
@@ -257,7 +294,13 @@ void Ball::checkCollision(int x, int y) {
     }
     else if(x != 0 && y != 0) {
         if(y > 0) {
-            if(bBall.y + bTexture.getHeight() > y) {
+            if(bBall.y + bTexture.getHeight() >= y) {
+                if(y == pole->getRim().y) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.y  = y - bTexture.getHeight();
                 bVelY = -bVelY/1.5;
                 if(firstRotation) {
@@ -268,7 +311,13 @@ void Ball::checkCollision(int x, int y) {
         }
         else {
             y = -y;
-            if(bBall.y < y) {
+            if(bBall.y <= y) {
+                if(y == pole->getRim().y || y == pole->getBelowBoard().y) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
                 if(firstRotation) {
@@ -285,6 +334,12 @@ void Ball::checkCollision(int x, int y) {
                 else {
                     hitBoard = false;
                 }
+                if(x == pole->getBoard().x || x == pole->getRim().x) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
                 bVelY = bVelY/1.5;
@@ -294,11 +349,23 @@ void Ball::checkCollision(int x, int y) {
         else {
             x = -x;
             if(bBall.x <= x) {
+                if(x == pole->getRim().x + pole->getRim().w - 5) {
+                    collidedWithPole = true;
+                }
+                else {
+                    collidedWithPole = false;
+                }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;
                 bVelY = bVelY/1.5;
                 rotationAngle = -rotationAngle;
             }
         }
+    }
+    if(abs(bVelY) < 2.5 && bBall.y >= bInitialY) {
+        bVelY = 0.0;
+    }
+    if(abs(bVelX) < 2 && bBall.y >= bInitialY && abs(bVelY-0.0) < 0.000001) {
+        bVelX = 0.0;
     }
 }

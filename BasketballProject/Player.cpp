@@ -4,6 +4,7 @@ const float Player::pGravity = 0.1;
 
 Player::Player(std::string name) {
     Player::pName = name;
+    currFrameTime = 0;
     Player::pFlip = SDL_FLIP_NONE;
     Player::pVelX = 0.0;
     Player::pVelY = 0.0;
@@ -21,7 +22,7 @@ Player::Player(std::string name) {
     Player::behindRim = false;
     Player::belowRim = false;
     Player::hasTheBall = false;
-    Player::hadTheBallBeforeJump = true;
+    Player::hadTheBallBeforeJump = false;
     Player::hasThrownTheBall = false;
 }
 
@@ -117,6 +118,7 @@ void Player::handleEvents(SDL_Event* e) {
             case SDLK_d:
                 if(facing == LEFT && hasLanded) {
                     frame = 0;
+                    currFrameTime = 0;
                 }
                 isStanding = false;
                 break;
@@ -124,6 +126,7 @@ void Player::handleEvents(SDL_Event* e) {
             case SDLK_a:
                 if(facing == RIGHT && hasLanded) {
                     frame = 0;
+                    currFrameTime = 0;
                 }
                 isStanding = false;
                 break;
@@ -131,6 +134,7 @@ void Player::handleEvents(SDL_Event* e) {
             case SDLK_LSHIFT:
                 if(!isDefending && !isJumping && !hasTheBall) {
                     frame = 0;
+                    currFrameTime = 0;
                     isDefending = true;
                     if(pMovementSpeed != 3) {
                         pMovementSpeed = 3;
@@ -147,6 +151,7 @@ void Player::handleEvents(SDL_Event* e) {
                         hadTheBallBeforeJump = false;
                     }
                     frame = 0;
+                    currFrameTime = 0;
                     pInitialY = pPos.y;
                     isJumping = true;
                     pVelY = pJumpPower;
@@ -157,15 +162,12 @@ void Player::handleEvents(SDL_Event* e) {
                     isStanding = false;
                 }
                 break;
-
-            case SDLK_p:
-
-                break;
         }
     }
     else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_a || e->key.keysym.sym == SDLK_d) && hasLanded) {
         pVelX = 0.0;
         frame = 0;
+        currFrameTime = 0;
         if(!hasTheBall) {
             pTexture = pNormalStance;
         }
@@ -179,6 +181,7 @@ void Player::handleEvents(SDL_Event* e) {
     else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_LSHIFT && hasLanded && !hasTheBall) {
         isDefending = false;
         frame = 0;
+        currFrameTime = 0;
         pMovementSpeed = 10;
         if(positioned) {
             pPos.y -= 20;
@@ -214,7 +217,6 @@ int Player::getTextureRealWidth() {
 
 void Player::processInput() {
     const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-
     if(keyState[SDL_SCANCODE_A]) {
         if(facing == RIGHT && hasLanded) {
             facing = LEFT;
@@ -223,6 +225,9 @@ void Player::processInput() {
         if(!isJumping) {
             isRunning = true;
             isStanding = false;
+            if(!isDefending) {
+                pMovementSpeed = 10;
+            }
         }
         pVelX = -pMovementSpeed;
     }
@@ -234,11 +239,14 @@ void Player::processInput() {
         if(!isJumping) {
             isRunning = true;
             isStanding = false;
+            if(!isDefending) {
+                pMovementSpeed = 10;
+            }
         }
         pVelX = pMovementSpeed;
     }
     else if(keyState[SDL_SCANCODE_LSHIFT]) {
-        if(!isDefending && !isJumping && !hasTheBall) {
+        if(!isDefending && hasLanded && !hasTheBall) {
             isDefending = true;
             if(pMovementSpeed != 3) {
                 pMovementSpeed = 3;
@@ -252,16 +260,22 @@ void Player::processInput() {
         if(pPos.y > pInitialY) {
             isJumping = false;
             frame = 0;
+            currFrameTime = 0;
             pMovementSpeed = 10;
             pVelY = 0.0;
             pVelX = 0.0;
             pPos.y = pInitialY;
             isStanding = true;
             hasLanded = true;
-            if(hadTheBallBeforeJump && !hasThrownTheBall) {
+            if(hadTheBallBeforeJump && !ball->hasCollidedWithThePole() && hasTheBall) {
                 ball->setPosition(100, SCREEN_HEIGHT - ball->getTexture().getHeight());
+                ball->setVelocity(0, 0);
                 ball->setPossession(false);
+                hadTheBallBeforeJump = false;
                 hasTheBall = false;
+            }
+            else {
+                ball->setHasCollidedWithThePole(false);
             }
             if(!hasTheBall && !isDefending) {
                 pTexture = pNormalStance;
@@ -284,6 +298,9 @@ void Player::processInput() {
 }
 
 void Player::checkCollision(int x, int y) {
+//    printf("%d HAS THE BALL\n", hasTheBall);
+//    printf("%d HAD THE BALL\n", hadTheBallBeforeJump);
+//    printf("%d has COLLIDED\n", ball->hasCollidedWithThePole());
     if(pPos.x < -(getTexture().getWidth() - getTextureRealWidth())/2) {
         pPos.x = -(getTexture().getWidth() - getTextureRealWidth())/2;
     }
@@ -377,6 +394,9 @@ void Player::checkBallCollision() {
             ball->setPossession(true);
             ball->setIsThrown(false);
             ball->setVelocity(0, 0);
+            if(isDefending) {
+                isDefending = false;
+            }
             //ball->setPosition(pPos.x + getTextureRealWidth()*2 - 30, pPos.y - 5);
 
         }

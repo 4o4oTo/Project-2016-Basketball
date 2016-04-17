@@ -13,7 +13,7 @@
 
 class BlackPlayer : public Player {
     int frameTime;
-    int currFrameTime;
+    //int currFrameTime;
     Texture runningTextures[RUNNING];
     Texture defenceTextures[DEFENDING];
     Texture jumpingTextures[JUMPING];

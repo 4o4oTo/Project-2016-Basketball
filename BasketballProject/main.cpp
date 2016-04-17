@@ -7,7 +7,7 @@
 #include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
-const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) - 200;
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) -200;
 const int AVG_FPS = 60;
 const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
@@ -38,7 +38,7 @@ BlackPlayer troy("Troy");
 
 //Entities
 BasketballPole gBasketballPole;
-Ball gBall(4);
+Ball gBall(5);
 
 bool init();
 

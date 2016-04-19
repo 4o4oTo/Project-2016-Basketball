@@ -7,7 +7,7 @@
 #include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
-const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) -200;
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) - 200;
 const int AVG_FPS = 60;
 const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
@@ -89,7 +89,9 @@ int main(int argc, char* argv[]) {
                         troy.checkBasketballPoleCollision(&gBasketballPole);
                         totalFrameTime -= TIME_PER_FRAME;
                     }
-                    gBall.checkCollisionWithPole();
+                    if(!gBall.isPossessed()) {
+                        gBall.checkCollisionWithPole();
+                    }
                     gCourt.render(0, 0, &gCourtClip);
                     gBall.render();
                     gBasketballPole.render();

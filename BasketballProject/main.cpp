@@ -7,7 +7,7 @@
 #include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
-const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN) - 200;
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);
 const int AVG_FPS = 60;
 const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
@@ -188,13 +188,13 @@ bool loadMedia() {
         gBackgroundClip.y = SCREEN_HEIGHT*0.4;
     }
 
-    if(!gCourt.loadFromFile("background/court.png")) {
+    if(!gCourt.loadFromFile("background/court2.png")) {
         printf("%s\n", SDL_GetError());
         success = false;
     }
     else {
         gCourtClip.x = 500;
-        gCourtClip.y = 20;
+        gCourtClip.y = -150;
         gCourtClip.w = SCREEN_WIDTH;
         gCourtClip.h = SCREEN_HEIGHT;
     }
@@ -262,10 +262,10 @@ bool loadMedia() {
         gBasketballPole.setRimDimensions(0, 220, 100, 10);
         gBasketballPole.setPosition(SCREEN_WIDTH -
                                     gBasketballPole.getBoard().w -
-                                    (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2,
+                                    (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2 - 70,
                                     SCREEN_HEIGHT - gBasketballPole.getTexture().getHeight());
         gBasketballPole.getBoard().x = gBasketballPole.getX() + (gBasketballPole.getTexture().getWidth() - gBasketballPole.getBoard().w)/2 - gBasketballPole.getBoard().w + 20;
-        gBasketballPole.getBelowBoard().x = SCREEN_WIDTH - gBasketballPole.getBelowBoard().w;
+        gBasketballPole.getBelowBoard().x = SCREEN_WIDTH - gBasketballPole.getBelowBoard().w - 70;
         gBasketballPole.getRim().x = gBasketballPole.getBoard().x - gBasketballPole.getRim().w;
     }
 

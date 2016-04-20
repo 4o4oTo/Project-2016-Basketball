@@ -83,8 +83,14 @@ std::string Texture::getText() {
     return Texture::_Text;
 }
 
-void Texture::render(int x, int y, SDL_Rect* clip, SDL_RendererFlip flip, double angle, SDL_Point* center) {
-    SDL_Rect renderQuad = {x, y, Texture::_TWidth, Texture::_THeight};
+void Texture::render(int x, int y, SDL_Rect* clip, SDL_RendererFlip flip, double angle, SDL_Point* center, int changedWidth, int changedHeight) {
+    SDL_Rect renderQuad;
+    if(changedHeight != 0 && changedWidth != 0 && changedHeight != _THeight && changedWidth != _TWidth) {
+        renderQuad = {x, y, changedWidth, changedHeight};
+    }
+    else {
+       renderQuad = {x, y, Texture::_TWidth, Texture::_THeight};
+    }
     if(clip != NULL) {
         renderQuad.w = clip->w;
         renderQuad.h = clip->h;

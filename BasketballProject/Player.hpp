@@ -18,6 +18,7 @@ protected:
     float pJumpPower;
     bool isDefending;
     bool isRunning;
+    bool isChangingPerspective;
     bool hasLanded;
     bool isStanding;
     bool isJumping;
@@ -35,6 +36,7 @@ protected:
     float pVelX;
     float pVelY;
     int textureRealHeight, textureRealWidth;
+    int changedHeight, changedWidth;
     float pMovementSpeed;
     bool behindRim;
     bool belowRim;

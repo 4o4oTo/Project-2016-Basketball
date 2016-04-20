@@ -8,6 +8,8 @@
 class Ball {
     const float bGravity;
     float bouncePower;
+    float changedWidth;
+    float changedHeight;
     SDL_Point bBall;
     Texture bTexture;
     bool possessed;
@@ -46,9 +48,13 @@ public:
 
     void processInput();
 
+    void setChangedDimensions(float changedWidth = 0, float changedHeight = 0);
+
     void handleEvents(SDL_Event* e);
 
     void update();
+
+    void resetDimensions();
 
     void checkCollision(int x = 0, int y = 0);
 

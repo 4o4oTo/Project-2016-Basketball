@@ -16,6 +16,8 @@ Ball::Ball(float bounce) : bGravity(0.3){
     firstRotation = true;
     bBall.x = 0;
     bBall.y = 0;
+    changedHeight = 0.0;
+    changedHeight = 0.0;
     bMaxPower = 10;
     bInitialY = 0;
     rotationAngle = 0.0;
@@ -71,11 +73,26 @@ int Ball::getX() {
 void Ball::setPosition(int x, int y) {
     bBall.x = x;
     bBall.y = y;
+    if(abs(changedHeight-0.0) < 0.00001 && abs(changedWidth-0.0) < 0.00001) {
+        changedHeight = (float) bTexture.getHeight();
+        changedWidth = (float) bTexture.getWidth();
+    }
+}
+
+void Ball::resetDimensions() {
+    changedHeight = bTexture.getHeight();
+    changedWidth = bTexture.getWidth();
 }
 
 void Ball::setVelocity(float xVel, float yVel) {
     bVelX = xVel;
     bVelY = yVel;
+}
+
+void Ball::setChangedDimensions(float w, float h) {
+    changedHeight += h;
+    changedWidth += w;
+    printf("%f %f\n", changedWidth, changedHeight);
 }
 
 void Ball::handleEvents(SDL_Event* e) {
@@ -100,7 +117,7 @@ void Ball::handleEvents(SDL_Event* e) {
 void Ball::render() {
     if(!possessed) {
         //if(thrown) {
-            bTexture.render(bBall.x, bBall.y, NULL, SDL_FLIP_NONE, rotationAngle);
+            bTexture.render(bBall.x, bBall.y, NULL, SDL_FLIP_NONE, rotationAngle, NULL, changedWidth, changedHeight);
 //        }
 //        else {
 //            bTexture.render(bBall.x, bBall.y);
@@ -133,6 +150,10 @@ void Ball::update() {
     }
 
     if(thrown && !possessed) {
+        if(!hasCollidedWithThePole() && abs(changedWidth-53.0) < 0.00001 && abs(changedHeight-50.0) < 0.00001) {
+            changedHeight += 0.2;
+            changedWidth += 0.2;
+        }
         if(bBall.y + bTexture.getHeight() > bInitialY + bTexture.getHeight()) {
             checkCollision(0, bInitialY + bTexture.getHeight());
         }
@@ -197,16 +218,16 @@ void Ball::checkCollisionWithPole() {
         checkCollision(pole->getRim().x);
     }
     else if(sameLvlAsRim && !beforeRim && !behindRim) {
-        if(bBall.x <= pole->getRim().x && bBall.y <= pole->getRim().y && hitBoard) {
-            printf("LEFT SIDE\n", bBall.x);
+        if(bBall.x <= pole->getRim().x && bBall.y + bTexture.getHeight()/4 <= pole->getRim().y && hitBoard) {
             checkCollision(-(pole->getRim().x), pole->getRim().y);
         }
         else if(bBall.x <= pole->getRim().x + pole->getRim().w - 15 && bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w && bBall.y <= pole->getRim().y) {
-            printf("RIGHT SIDE\n", pole->getRim().x);
             checkCollision(pole->getRim().x + pole->getRim().w - 15, pole->getRim().y);
         }
+        else if(bBall.y + bTexture.getHeight()/2 >= pole->getRim().y + pole->getRim().h && !hitBoard) {
+            checkCollision(pole->getBoard().x);
+        }
         else if(bBall.x <= pole->getRim().x && !hitBoard) {
-            printf("sho stava\n");
             checkCollision(0, pole->getRim().y);
         }
     }
@@ -233,9 +254,6 @@ void Ball::checkCollision(int x, int y) {
                 if(x == pole->getBoard().x || x == pole->getRim().x) {
                     collidedWithPole = true;
                 }
-                else {
-                    collidedWithPole = false;
-                }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
                 bVelY = bVelY/1.5;
@@ -247,9 +265,6 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x <= x) {
                 if(x == pole->getRim().x + pole->getRim().w - 5) {
                     collidedWithPole = true;
-                }
-                else {
-                    collidedWithPole = false;
                 }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;
@@ -264,12 +279,8 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y + bTexture.getHeight() > y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
-                    bVelY = -bVelY/3;
                 }
-                else {
-                    collidedWithPole = false;
-                    bVelY = -bVelY/1.5;
-                }
+                bVelY = -bVelY/1.5;
                 bBall.y  = y - bTexture.getHeight();
                 if(firstRotation) {
                     rotationAngle = -rotationAngle;
@@ -282,9 +293,6 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y <= y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
-                }
-                else {
-                    collidedWithPole = false;
                 }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
@@ -301,9 +309,6 @@ void Ball::checkCollision(int x, int y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
                 }
-                else {
-                    collidedWithPole = false;
-                }
                 bBall.y  = y - bTexture.getHeight();
                 bVelY = -bVelY/1.5;
                 if(firstRotation) {
@@ -317,9 +322,6 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y <= y) {
                 if(y == pole->getRim().y || y == pole->getBelowBoard().y) {
                     collidedWithPole = true;
-                }
-                else {
-                    collidedWithPole = false;
                 }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
@@ -337,9 +339,6 @@ void Ball::checkCollision(int x, int y) {
                 if(x == pole->getBoard().x || x == pole->getRim().x) {
                     collidedWithPole = true;
                 }
-                else {
-                    collidedWithPole = false;
-                }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
                 bVelY = bVelY/1.5;
@@ -351,9 +350,6 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x <= x) {
                 if(x == pole->getRim().x + pole->getRim().w - 5) {
                     collidedWithPole = true;
-                }
-                else {
-                    collidedWithPole = false;
                 }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;

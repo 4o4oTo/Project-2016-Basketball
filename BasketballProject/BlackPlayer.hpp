@@ -10,6 +10,7 @@
 #define DRIBBLING 21
 #define STANDDRIBBLE 22
 #define SHOOT 5
+#define SCORE 22
 
 class BlackPlayer : public Player {
     int frameTime;
@@ -20,6 +21,7 @@ class BlackPlayer : public Player {
     Texture dribblingTextures[DRIBBLING];
     Texture standDribbleTextures[STANDDRIBBLE];
     Texture shootingTextures[SHOOT];
+    Texture scoreTextures[SCORE];
 public:
     BlackPlayer(std::string name);
 
@@ -37,7 +39,13 @@ public:
 
     void setStandDribbleScenes();
 
+    void setScoreIndicator();
+
+    void setInitialScore();
+
     void update();
+
+    void handleEvents(SDL_Event* e);
 };
 
 #endif

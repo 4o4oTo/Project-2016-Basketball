@@ -7,7 +7,9 @@ enum MenuButtons {
     PLAY = 0,
     OPTIONS = 1,
     EXIT = 2,
-    TOTAL_MENU_BUTTONS = 3
+    RESUME = 3,
+    MAIN_MENU = 4,
+    TOTAL_MENU_BUTTONS = 5
 };
 
 class MenuButton : public Button {
@@ -25,8 +27,6 @@ public:
     void unclick();
 
     void setCurrentButton(MenuButtons b);
-
-    void setClip(int x, int y, int w, int h);
 
 };
 

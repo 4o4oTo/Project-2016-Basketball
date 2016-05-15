@@ -15,14 +15,23 @@ class Player {
 protected:
     static const float pGravity;
     int pInitialY;
+    int pShotPosition;
     float pJumpPower;
+    float pMovementSpeed;
     bool isDefending;
     bool isRunning;
     bool isChangingPerspective;
     bool hasLanded;
     bool isStanding;
     bool isJumping;
+    bool hasTheBall;
+    bool hadTheBallBeforeJump;
     bool hasThrownTheBall;
+    bool hasScored;
+    bool isComingCloser;
+    bool isGoingAway;
+    bool movingLeft;
+    bool movingRight;
     int frame;
     int currFrameTime;
     bool positioned;
@@ -33,28 +42,45 @@ protected:
     FacingDirection facing;
     Texture pNormalStance;
     Texture pDefenceStance;
+    Texture pCurrentScore;
     float pVelX;
     float pVelY;
     int textureRealHeight, textureRealWidth;
     int changedHeight, changedWidth;
-    float pMovementSpeed;
     bool behindRim;
     bool belowRim;
-    bool hasTheBall;
-    bool hadTheBallBeforeJump;
     Ball* ball;
+    Mix_Chunk* dribble;
+    int pScore;
+    SDL_Rect scoreIndicatorPos;
 public:
-    Player(std::string name);
+    Player(std::string name, float jumpPower);
 
     ~Player();
 
-    void handleEvents(SDL_Event* e);
+    virtual void handleEvents(SDL_Event* e) = 0;
 
     virtual void setRunningScenes() = 0;
+
+    virtual void setDefenceScenes() = 0;
+
+    virtual void setJumpingScenes() = 0;
+
+    virtual void setDribblingScenes() = 0;
+
+    virtual void setShootingScenes() = 0;
+
+    virtual void setStandDribbleScenes() = 0;
+
+    virtual void setScoreIndicator() = 0;
+
+    virtual void setInitialScore() = 0;
 
     virtual void update() = 0;
 
     void setInitialPosition(int x, int y);
+
+    bool loadSoundEffects();
 
     void passTheBall(Ball* b);
 
@@ -63,6 +89,8 @@ public:
     void setBelowRim(bool below);
 
     void setBallPossession(bool possession);
+
+    void setScoreIndicatorPosition(int x, int y);
 
     void processInput();
 
@@ -81,6 +109,8 @@ public:
     void setFacingDirection(FacingDirection dir);
 
     bool loadTextureFromFile(std::string path);
+
+    void setNormalStance();
 
     bool setNormalStance(std::string path);
 
@@ -109,5 +139,7 @@ public:
     std::string getName();
 
     void render();
+
+    void renderScoreIndicator();
 };
 #endif

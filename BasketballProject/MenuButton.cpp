@@ -43,15 +43,7 @@ void MenuButton::handleEvents(SDL_Event* e) {
             switch(e->type) {
                 case SDL_MOUSEBUTTONDOWN:
                     MenuButton::_BColor = {255, 255, 255};
-                    if(MenuButton::currentButton == EXIT) {
-                        click();
-                    }
-                    else if(MenuButton::currentButton == PLAY) {
-                        click();
-                    }
-                    else if(MenuButton::currentButton == OPTIONS) {
-                        click();
-                    }
+                    click();
                     break;
 
                 case SDL_MOUSEBUTTONUP:

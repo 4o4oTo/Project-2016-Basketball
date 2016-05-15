@@ -22,17 +22,27 @@ class Ball {
     bool behindRim;
     bool beforeRim;
     bool firstRotation;
+    bool wasChangingPerspective;
+    bool hasGoneThroughTheNet;
     float bVelX;
     float bVelY;
     float bMaxPower;
     float bInitialY;
     float rotationAngle;
     BasketballPole* pole;
+    Mix_Chunk* rim;
+    Mix_Chunk* swish;
+    Mix_Chunk* backboard;
+    Mix_Chunk* dribble;
 public:
 
     Ball(float bounce);
 
     ~Ball();
+
+    void changingPerspective(bool b);
+
+    bool loadSoundEffects();
 
     Texture& getTexture();
 
@@ -45,6 +55,8 @@ public:
     void setPosition(int x, int y);
 
     void setHasCollidedWithThePole(bool b);
+
+    void setHasScored(bool h);
 
     void processInput();
 
@@ -69,6 +81,8 @@ public:
     void setVelocity(float xVel, float yVel);
 
     bool isThrown();
+
+    bool hasScored();
 
     bool hasCollidedWithThePole();
 

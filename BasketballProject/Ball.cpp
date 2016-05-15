@@ -2,8 +2,8 @@
 
 Ball::Ball(float bounce) : bGravity(0.3){
     bouncePower = bounce;
-    bVelX = 0;
-    bVelY = 0;
+    bVelX = 0.0;
+    bVelY = 0.0;
     possessed = false;
     thrown = false;
     sameLvlAsRim = false;
@@ -14,6 +14,8 @@ Ball::Ball(float bounce) : bGravity(0.3){
     behindRim = false;
     beforeRim = true;
     firstRotation = true;
+    wasChangingPerspective = false;
+    hasGoneThroughTheNet = false;
     bBall.x = 0;
     bBall.y = 0;
     changedHeight = 0.0;
@@ -21,6 +23,10 @@ Ball::Ball(float bounce) : bGravity(0.3){
     bMaxPower = 10;
     bInitialY = 0;
     rotationAngle = 0.0;
+    dribble = NULL;
+    rim = NULL;
+    swish = NULL;
+    backboard = NULL;
 }
 
 Ball::~Ball() {
@@ -28,10 +34,51 @@ Ball::~Ball() {
     bVelX = 0;
     bVelY = 0;
     bouncePower = 0;
+    Mix_FreeChunk(backboard);
+    Mix_FreeChunk(rim);
+    Mix_FreeChunk(swish);
+    Mix_FreeChunk(dribble);
+    backboard = NULL;
+    rim = NULL;
+    swish = NULL;
+    dribble = NULL;
+}
+
+bool Ball::loadSoundEffects() {
+    bool success = true;
+    dribble = Mix_LoadWAV("music/Dribble.wav");
+    if(dribble == NULL) {
+        printf("%s\n", Mix_GetError());
+        success = false;
+    }
+    rim = Mix_LoadWAV("music/Rim.wav");
+    if(rim == NULL) {
+        printf("%s\n", Mix_GetError());
+        success = false;
+    }
+    swish = Mix_LoadWAV("music/Swish.wav");
+    if(swish == NULL) {
+        printf("%s\n", Mix_GetError());
+        success = false;
+    }
+    backboard = Mix_LoadWAV("music/Backboard.wav");
+    if(backboard == NULL) {
+        printf("%s\n", Mix_GetError());
+        success = false;
+    }
+    return success;
 }
 
 void Ball::passThePole(BasketballPole* p) {
     pole = p;
+}
+
+void Ball::setHasScored(bool h) {
+    hasGoneThroughTheNet = h;
+}
+
+void Ball::changingPerspective(bool b) {
+    wasChangingPerspective = b;
 }
 
 void Ball::setHasCollidedWithThePole(bool b) {
@@ -48,6 +95,10 @@ bool Ball::isPossessed() {
 
 bool Ball::hasCollidedWithThePole() {
     return collidedWithPole;
+}
+
+bool Ball::hasScored() {
+    return hasGoneThroughTheNet;
 }
 
 void Ball::setIsThrown(bool t) {
@@ -90,9 +141,12 @@ void Ball::setVelocity(float xVel, float yVel) {
 }
 
 void Ball::setChangedDimensions(float w, float h) {
-    changedHeight += h;
-    changedWidth += w;
-    printf("%f %f\n", changedWidth, changedHeight);
+    if(changedHeight + h <= bTexture.getHeight()) {
+        changedHeight += h;
+    }
+    if(changedWidth + w <= bTexture.getWidth()) {
+        changedWidth += w;
+    }
 }
 
 void Ball::handleEvents(SDL_Event* e) {
@@ -127,17 +181,42 @@ void Ball::render() {
 
 void Ball::processInput() {
     const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-
     if(keyState[SDL_SCANCODE_R]) {
         if(possessed && !thrown) {
-            bVelX += bGravity*2.8;
-            bVelY -= bGravity/1.1;
+            if(bBall.x < 700) {
+                bVelX += bGravity*2.5;
+                bVelY -= bGravity/1.1;
+                if(bVelY <= -bMaxPower*2) {
+                    bVelY = -bMaxPower*2;
+                }
+            }
+            else if(bBall.x >= 700 && bBall.x <= 953) {
+                if(wasChangingPerspective) {
+                    bVelX += bGravity*0.0001;
+                    bVelY -= bGravity/0.7;
+                    if(bVelY <= -bMaxPower) {
+                        bVelY = -bMaxPower;
+                    }
+                }
+                else {
+                    bVelX += bGravity*0.2;
+                    bVelY -= bGravity/0.7;
+                    if(bVelY <= -bMaxPower) {
+                        bVelY = -bMaxPower;
+                    }
+                }
+            }
+            else {
+                bVelX = 0;
+                bVelY -= bGravity/0.5;
+                if(bVelY <= -bMaxPower) {
+                    bVelY = -bMaxPower;
+                }
+            }
             if(bVelX >= bMaxPower) {
                 bVelX = bMaxPower;
             }
-            if(bVelY <= -bMaxPower*2) {
-                bVelY = -bMaxPower*2;
-            }
+
         }
     }
 }
@@ -148,14 +227,23 @@ void Ball::update() {
     if(possessed && hitBoard) {
         hitBoard = false;
     }
-
     if(thrown && !possessed) {
-        if(!hasCollidedWithThePole() && abs(changedWidth-53.0) < 0.00001 && abs(changedHeight-50.0) < 0.00001) {
-            changedHeight += 0.2;
-            changedWidth += 0.2;
+        if(!hasCollidedWithThePole()) {
+            if(abs(changedWidth-53.0) > 0.00001) {
+                changedWidth += 0.5;
+            }
+            if(abs(changedHeight-50.0) > 0.00001) {
+                changedHeight += 0.5;
+            }
         }
         if(bBall.y + bTexture.getHeight() > bInitialY + bTexture.getHeight()) {
             checkCollision(0, bInitialY + bTexture.getHeight());
+            if(hasGoneThroughTheNet) {
+                hasGoneThroughTheNet = false;
+                setPosition(100, SCREEN_HEIGHT - bTexture.getHeight());
+                setVelocity(0.0, 0.0);
+            }
+            Mix_PlayChannel(-1, dribble, 0);
         }
         if(rotationAngle > 0) {
             rotationAngle += 8;
@@ -184,58 +272,82 @@ void Ball::update() {
 }
 
 void Ball::checkCollisionWithPole() {
-    if(bBall.x + bTexture.getWidth() <= pole->getRim().x) {
-        beforeRim = true;
-        behindRim = false;
-    }
-    else if(bBall.x >= pole->getRim().x + pole->getRim().w) {
-        behindRim = true;
-        beforeRim = false;
-    }
-    else {
-        behindRim = false;
-        beforeRim = false;
-    }
-    if(bBall.y + bTexture.getHeight() < pole->getRim().y) {
-        aboveRim = true;
-        sameLvlAsRim = false;
-        belowRim = false;
-    }
-    else if(bBall.y <= pole->getRim().y && bBall.y + bTexture.getHeight() >= pole->getRim().y + pole->getRim().h) {
-        sameLvlAsRim = true;
-        aboveRim = false;
-        belowRim = false;
-    }
-    else if(bBall.y > pole->getRim().y + pole->getRim().h) {
-        belowRim = true;
-        aboveRim = false;
-        sameLvlAsRim = false;
-    }
-    if(aboveRim) {
-        checkCollision(pole->getBoard().x);
-    }
-    else if(sameLvlAsRim && bBall.x + 2*bTexture.getWidth()/3 <= pole->getRim().x && !hitBoard && thrown) {
-        checkCollision(pole->getRim().x);
-    }
-    else if(sameLvlAsRim && !beforeRim && !behindRim) {
-        if(bBall.x <= pole->getRim().x && bBall.y + bTexture.getHeight()/4 <= pole->getRim().y && hitBoard) {
-            checkCollision(-(pole->getRim().x), pole->getRim().y);
+    if(abs(changedWidth-53.0) <= 1.0 && abs(changedHeight-50.0) <= 1.0) {
+        if(bBall.x + bTexture.getWidth() <= pole->getRim().x) {
+            beforeRim = true;
+            behindRim = false;
         }
-        else if(bBall.x <= pole->getRim().x + pole->getRim().w - 15 && bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w && bBall.y <= pole->getRim().y) {
-            checkCollision(pole->getRim().x + pole->getRim().w - 15, pole->getRim().y);
+        else if(bBall.x >= pole->getRim().x + pole->getRim().w) {
+            behindRim = true;
+            beforeRim = false;
         }
-        else if(bBall.y + bTexture.getHeight()/2 >= pole->getRim().y + pole->getRim().h && !hitBoard) {
-            checkCollision(pole->getBoard().x);
+        else {
+            behindRim = false;
+            beforeRim = false;
         }
-        else if(bBall.x <= pole->getRim().x && !hitBoard) {
-            checkCollision(0, pole->getRim().y);
+        if(bBall.y + bTexture.getHeight() < pole->getRim().y) {
+            aboveRim = true;
+            sameLvlAsRim = false;
+            belowRim = false;
         }
-    }
-    else if(belowRim && behindRim) {
-        checkCollision(pole->getBelowBoard().x, -pole->getBelowBoard().y);
-    }
-    else{
-        checkCollision();
+        else if(bBall.y <= pole->getRim().y && bBall.y + bTexture.getHeight() >= pole->getRim().y + pole->getRim().h) {
+            sameLvlAsRim = true;
+            aboveRim = false;
+            belowRim = false;
+        }
+        else if(bBall.y > pole->getRim().y + pole->getRim().h) {
+            belowRim = true;
+            aboveRim = false;
+            sameLvlAsRim = false;
+        }
+        if(aboveRim) {
+            if(!wasChangingPerspective) {
+                checkCollision(pole->getBoard().x);
+            }
+        }
+        else if(sameLvlAsRim && bBall.x + 2*bTexture.getWidth()/3 <= pole->getRim().x && !hitBoard && thrown) {
+            checkCollision(pole->getRim().x);
+        }
+        else if(sameLvlAsRim && !beforeRim && !behindRim) {
+            if(bBall.x <= pole->getRim().x && bBall.y + bTexture.getHeight()/4 <= pole->getRim().y && hitBoard) {
+                checkCollision(-(pole->getRim().x), pole->getRim().y);
+            }
+            else if(bBall.x <= pole->getRim().x + pole->getRim().w - 20 && bBall.x + bTexture.getWidth() >= pole->getRim().x + pole->getRim().w - 18 && bBall.y <= pole->getRim().y) {
+                if(!hitBoard) {
+                    checkCollision(pole->getRim().x + pole->getRim().w - 20, pole->getRim().y);
+                }
+                else {
+                    checkCollision(pole->getRim().x + pole->getRim().w - 20, 0);
+                }
+            }
+            else if(bBall.y + bTexture.getHeight()/3 >= pole->getRim().y + pole->getRim().h && !hitBoard) {
+                checkCollision(pole->getBoard().x);
+                Mix_PlayChannel(-1, swish, 0);
+                if(!hasGoneThroughTheNet) {
+                    hasGoneThroughTheNet = true;
+                }
+            }
+            else if(bBall.x <= pole->getRim().x && !hitBoard) {
+                if(wasChangingPerspective) {
+                    checkCollision(-(pole->getRim().x), 0);
+                }
+                else {
+                    checkCollision(0, pole->getRim().y);
+                }
+            }
+            else if(bBall.y + bTexture.getHeight()/3 >= pole->getRim().y + pole->getRim().h && hitBoard) {
+                Mix_PlayChannel(-1, swish, 0);
+                if(!hasGoneThroughTheNet) {
+                    hasGoneThroughTheNet = true;
+                }
+            }
+        }
+        else if(belowRim && behindRim) {
+            checkCollision(pole->getBelowBoard().x, -pole->getBelowBoard().y);
+        }
+        else{
+            checkCollision();
+        }
     }
 }
 
@@ -250,9 +362,13 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x + bTexture.getWidth() >= x) {
                 if(x == pole->getBoard().x) {
                     hitBoard = true;
+                    Mix_PlayChannel(-1, backboard, 0);
                 }
                 if(x == pole->getBoard().x || x == pole->getRim().x) {
                     collidedWithPole = true;
+                    if(x == pole->getRim().x) {
+                        Mix_PlayChannel(-1, rim, 0);
+                    }
                 }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
@@ -265,6 +381,7 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x <= x) {
                 if(x == pole->getRim().x + pole->getRim().w - 5) {
                     collidedWithPole = true;
+                    Mix_PlayChannel(-1, rim, 0);
                 }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;
@@ -279,6 +396,7 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y + bTexture.getHeight() > y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
+                    Mix_PlayChannel(-1, rim, 0);
                 }
                 bVelY = -bVelY/1.5;
                 bBall.y  = y - bTexture.getHeight();
@@ -293,6 +411,7 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y <= y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
+                    Mix_PlayChannel(-1, rim, 0);
                 }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
@@ -308,6 +427,7 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y + bTexture.getHeight() >= y) {
                 if(y == pole->getRim().y) {
                     collidedWithPole = true;
+                    Mix_PlayChannel(-1, rim, 0);
                 }
                 bBall.y  = y - bTexture.getHeight();
                 bVelY = -bVelY/1.5;
@@ -322,6 +442,9 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.y <= y) {
                 if(y == pole->getRim().y || y == pole->getBelowBoard().y) {
                     collidedWithPole = true;
+                    if(x == pole->getRim().x) {
+                        Mix_PlayChannel(-1, rim, 0);
+                    }
                 }
                 bBall.y = y;
                 bVelY = -bVelY/1.5;
@@ -335,9 +458,13 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x + bTexture.getWidth() >= x) {
                 if(x == pole->getBoard().x) {
                     hitBoard = true;
+                    Mix_PlayChannel(-1, backboard, 0);
                 }
                 if(x == pole->getBoard().x || x == pole->getRim().x) {
                     collidedWithPole = true;
+                    if(x == pole->getRim().x) {
+                        Mix_PlayChannel(-1, rim, 0);
+                    }
                 }
                 bBall.x = x - bTexture.getWidth();
                 bVelX = -bVelX/1.5;
@@ -350,6 +477,7 @@ void Ball::checkCollision(int x, int y) {
             if(bBall.x <= x) {
                 if(x == pole->getRim().x + pole->getRim().w - 5) {
                     collidedWithPole = true;
+                    Mix_PlayChannel(-1, rim, 0);
                 }
                 bBall.x = x;
                 bVelX = -bVelX/1.5;

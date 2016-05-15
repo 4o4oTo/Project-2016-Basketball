@@ -15,6 +15,12 @@ SDL_Window* gWindow = NULL;
 
 SDL_Renderer* gRenderer = NULL;
 
+//Reset the game
+bool resetGame = false;
+
+//Pause
+bool gamePaused = false;
+
 //Music
 Mix_Music* gMusic = NULL;
 MusicButton gMusicButton;
@@ -57,7 +63,6 @@ int main(int argc, char* argv[]) {
             Uint8 frameTime = 0;
             Uint8 totalFrameTime = 0;
             while(!quit) {
-
                 prevTime = currTime;
                 currTime = SDL_GetTicks();
                 frameTime = currTime - prevTime;
@@ -67,9 +72,25 @@ int main(int argc, char* argv[]) {
                     if(e.type == SDL_QUIT) {
                         quit = true;
                     }
-                    for(int i = 0; i < 3; i++) {
-                        gMenuButtons[i].handleEvents(&e);
+                    if(e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_p) {
+                        if(!gamePaused) {
+                            gamePaused = true;
+                        }
+                        else {
+                            gamePaused = false;
+                        }
                     }
+                    if(!gamePaused) {
+                        for(int i = PLAY; i < EXIT+1; i++) {
+                            gMenuButtons[i].handleEvents(&e);
+                        }
+                    }
+                    else {
+                        for(int i = RESUME; i < TOTAL_MENU_BUTTONS; i++) {
+                            gMenuButtons[i].handleEvents(&e);
+                        }
+                    }
+
 
                     gMusicButton.handleEvents(&e);
 
@@ -82,20 +103,46 @@ int main(int argc, char* argv[]) {
                 SDL_RenderClear(gRenderer);
 
                 if(gMenuButtons[PLAY].isClicked()) {
-                    while(totalFrameTime >= TIME_PER_FRAME) {
-                        troy.update();
-                        gBall.update();
-                        troy.checkBallCollision();
-                        troy.checkBasketballPoleCollision(&gBasketballPole);
-                        totalFrameTime -= TIME_PER_FRAME;
+                    if(!gamePaused) {
+                        if(resetGame) {
+                            troy.setNormalStance();
+                            troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
+                            troy.setFacingDirection(RIGHT);
+                            gBall.setPosition(100, SCREEN_HEIGHT - gBall.getTexture().getHeight());
+                            gBall.setVelocity(0.0, 0.0);
+                            troy.setInitialScore();
+                            resetGame = false;
+                        }
+                        while(totalFrameTime >= TIME_PER_FRAME) {
+                            troy.update();
+                            gBall.update();
+                            troy.checkBallCollision();
+                            troy.checkBasketballPoleCollision(&gBasketballPole);
+                            totalFrameTime -= TIME_PER_FRAME;
+                        }
+                        if(!gBall.isPossessed()) {
+                            gBall.checkCollisionWithPole();
+                        }
+                        gCourt.render(0, 0, &gCourtClip);
+                        troy.render();
+                        gBall.render();
+                        gBasketballPole.render();
+                        troy.renderScoreIndicator();
                     }
-                    if(!gBall.isPossessed()) {
-                        gBall.checkCollisionWithPole();
+                    else {
+                        gBackgroundTexture.render(0, 0, &gBackgroundClip);
+                        gMenuButtons[RESUME].render();
+                        gMenuButtons[MAIN_MENU].render();
+                        if(gMenuButtons[RESUME].isClicked()) {
+                            gamePaused = false;
+                            gMenuButtons[RESUME].unclick();
+                        }
+                        else if(gMenuButtons[MAIN_MENU].isClicked()) {
+                            gMenuButtons[PLAY].unclick();
+                            gamePaused = false;
+                            gMenuButtons[MAIN_MENU].unclick();
+                        }
                     }
-                    gCourt.render(0, 0, &gCourtClip);
-                    gBall.render();
-                    gBasketballPole.render();
-                    troy.render();
                 }
                 else if(gMenuButtons[OPTIONS].isClicked()) {
 
@@ -105,7 +152,7 @@ int main(int argc, char* argv[]) {
 
                     gBackgroundTexture.render(0, 0, &gBackgroundClip);
 
-                    for(int j = 0; j < 3; j++) {
+                    for(int j = PLAY; j < EXIT+1; j++) {
                         gMenuButtons[j].render();
                     }
                 }
@@ -113,8 +160,12 @@ int main(int argc, char* argv[]) {
 
                     gBackgroundTexture.render(0, 0, &gBackgroundClip);
 
-                    for(int j = 0; j < 3; j++) {
+                    for(int j = PLAY; j < EXIT+1; j++) {
                         gMenuButtons[j].render();
+                    }
+
+                    if(!resetGame) {
+                        resetGame = true;
                     }
                 }
 
@@ -193,7 +244,7 @@ bool loadMedia() {
         success = false;
     }
     else {
-        gCourtClip.x = 500;
+        gCourtClip.x = 600;
         gCourtClip.y = -150;
         gCourtClip.w = SCREEN_WIDTH;
         gCourtClip.h = SCREEN_HEIGHT;
@@ -249,6 +300,23 @@ bool loadMedia() {
             gMenuButtons[EXIT].setCurrentButton(EXIT);
         }
 
+        //Resume
+        if(!gMenuButtons[RESUME].loadTextureFromText("Resume", textColor)) {
+            success = false;
+        }
+        else {
+            gMenuButtons[RESUME].setDimensions(SCREEN_WIDTH*0.42, SCREEN_HEIGHT*0.16, gMenuButtons[RESUME].getWidth(), gMenuButtons[RESUME].getHeight());
+            gMenuButtons[RESUME].setCurrentButton(RESUME);
+        }
+
+        //Main menu
+        if(!gMenuButtons[MAIN_MENU].loadTextureFromText("Main Menu", textColor)) {
+            success = false;
+        }
+        else {
+            gMenuButtons[MAIN_MENU].setDimensions(SCREEN_WIDTH*0.40, SCREEN_HEIGHT*0.77, gMenuButtons[MAIN_MENU].getWidth(), gMenuButtons[MAIN_MENU].getHeight());
+            gMenuButtons[MAIN_MENU].setCurrentButton(MAIN_MENU);
+        }
 
     }
 
@@ -269,7 +337,7 @@ bool loadMedia() {
         gBasketballPole.getRim().x = gBasketballPole.getBoard().x - gBasketballPole.getRim().w;
     }
 
-    if(!gBall.getTexture().loadFromFile("entity/Basketball/Ball.png")) {
+    if(!gBall.getTexture().loadFromFile("entity/Basketball/Ball.png") || !gBall.loadSoundEffects()) {
         printf("%s\n", SDL_GetError());
         success = false;
     }
@@ -278,7 +346,7 @@ bool loadMedia() {
         gBall.passThePole(&gBasketballPole);
     }
 
-    if(!troy.setNormalStance("player/NormalRunning/Run.1.png")) {
+    if(!troy.setNormalStance("player/Troy/NormalRunning/Run.1.png") || !troy.loadSoundEffects()) {
         printf("%s\n", SDL_GetError());
         success = false;
     }
@@ -286,7 +354,7 @@ bool loadMedia() {
         troy.setTextureRealDimensions(100,290);
         troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
         troy.setFacingDirection(RIGHT);
-        if(troy.setDefenceStance("player/DefenceStance/DefenceStance.png")) {
+        if(troy.setDefenceStance("player/Troy/DefenceStance/DefenceStance.png")) {
             troy.setDefenceScenes();
         }
         troy.setRunningScenes();
@@ -295,6 +363,9 @@ bool loadMedia() {
         troy.setStandDribbleScenes();
         troy.setShootingScenes();
         troy.passTheBall(&gBall);
+        troy.setScoreIndicator();
+        troy.setScoreIndicatorPosition(0, 90);
+        troy.setInitialScore();
     }
 
     return success;

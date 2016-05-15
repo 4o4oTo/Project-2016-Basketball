@@ -1,18 +1,181 @@
 #include "BlackPlayer.hpp"
 
-BlackPlayer::BlackPlayer(std::string name) : Player::Player(name) {
+BlackPlayer::BlackPlayer(std::string name) : Player::Player(name, -10.0) {
     frameTime = 2;
     //currFrameTime = 0;
-    pJumpPower = -10;
+    pJumpPower = -10.0;
     pMovementSpeed = 10;
+}
+
+void BlackPlayer::setInitialScore() {
+    pCurrentScore = scoreTextures[0];
+    pScore = 0;
+}
+
+void BlackPlayer::handleEvents(SDL_Event* e) {
+    if(e->type == SDL_KEYDOWN) {
+        switch(e->key.keysym.sym) {
+            case SDLK_d:
+                if(facing == LEFT && hasLanded) {
+                    frame = 0;
+                    currFrameTime = 0;
+                    movingRight = true;
+                }
+                isStanding = false;
+                break;
+
+            case SDLK_a:
+                if(facing == RIGHT && hasLanded) {
+                    frame = 0;
+                    currFrameTime = 0;
+                    movingLeft = true;
+                }
+                isStanding = false;
+                break;
+
+            case SDLK_LSHIFT:
+                if(!isDefending && !isJumping && !hasTheBall) {
+                    frame = 0;
+                    currFrameTime = 0;
+                    isDefending = true;
+                    if(pMovementSpeed != 3) {
+                        pMovementSpeed = 3;
+                    }
+                }
+                break;
+            case SDLK_SPACE:
+                if(!isJumping) {
+                    if(hasTheBall) {
+                        pShotPosition = pPos.x + getTextureRealWidth()*2;
+                        ball->setVelocity(0, 0);
+                        hadTheBallBeforeJump = true;
+                    }
+                    else {
+                        hadTheBallBeforeJump = false;
+                    }
+                    frame = 0;
+                    currFrameTime = 0;
+                    pInitialY = pPos.y;
+                    isJumping = true;
+                    if(!isChangingPerspective) {
+                        pVelY = pJumpPower;
+                    }
+                    else {
+                        pVelY = 8*pJumpPower/9;
+                    }
+                    pMovementSpeed = 3;
+                    hasLanded = false;
+                    isDefending = false;
+                    isRunning = false;
+                    isStanding = false;
+                }
+                break;
+
+            case SDLK_w:
+                if(!isJumping) {
+                    isChangingPerspective = true;
+                    ball->changingPerspective(true);
+                    isGoingAway = true;
+                }
+                break;
+
+            case SDLK_s:
+                if(!isJumping) {
+                    isChangingPerspective = true;
+                    ball->changingPerspective(true);
+                    isComingCloser = true;
+                }
+                break;
+        }
+    }
+    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_a || e->key.keysym.sym == SDLK_d) && hasLanded) {
+        pVelX = 0.0;
+        frame = 0;
+        currFrameTime = 0;
+        if(!hasTheBall) {
+            pTexture = pNormalStance;
+        }
+        isRunning = false;
+        isStanding = true;
+        if(positioned) {
+            pPos.y -= 20;
+            positioned = false;
+        }
+        if(e->key.keysym.sym == SDLK_a) {
+            movingLeft = false;
+        }
+        else {
+            movingRight = false;
+        }
+    }
+    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_LSHIFT && hasLanded && !hasTheBall) {
+        isDefending = false;
+        frame = 0;
+        currFrameTime = 0;
+        pMovementSpeed = 10;
+        if(positioned) {
+            pPos.y -= 20;
+            positioned = false;
+        }
+        if(!isRunning) {
+            pTexture = pNormalStance;
+        }
+    }
+    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_r && isJumping && hasTheBall && facing == RIGHT) {
+        hasThrownTheBall = true;
+        hasTheBall = false;
+        ball->setIsThrown(true);
+    }
+    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_w || e->key.keysym.sym == SDLK_s) && hasLanded) {
+        pVelY = 0.0;
+        frame = 0;
+        currFrameTime = 0;
+        if(pPos.y == 478) {
+            isChangingPerspective = false;
+            ball->changingPerspective(false);
+        }
+        if(!hasTheBall) {
+            pTexture = pNormalStance;
+        }
+        if(e->key.keysym.sym == SDLK_w) {
+            isGoingAway = false;
+        }
+        else {
+            isComingCloser = false;
+        }
+        isRunning = false;
+        isStanding = true;
+    }
 }
 
 void BlackPlayer::update() {
 
-    processInput();
+    Player::processInput();
+
+    if(hadTheBallBeforeJump && ball->hasScored() && !hasScored) {
+        if((pShotPosition <= 553 && !isChangingPerspective)
+                || (isChangingPerspective && pInitialY == 403)
+                || (isChangingPerspective && pShotPosition <= 553)){
+            if(pScore + 2 > 21) {
+                pScore = 21;
+            }
+            else {
+                pScore += 2;
+            }
+        }
+        else {
+            if(pScore + 1 > 21) {
+                pScore = 21;
+            }
+            else {
+                pScore++;
+            }
+        }
+        pCurrentScore = scoreTextures[pScore];
+        hasScored = true;
+    }
 
     if(isRunning && !isDefending && !hasTheBall) {
-
         if(currFrameTime == frameTime) {
             frame++;
             currFrameTime = 0;
@@ -65,6 +228,9 @@ void BlackPlayer::update() {
     else if(hasTheBall && isStanding) {
         if(currFrameTime == frameTime) {
             frame++;
+            if(frame == 8) {
+                Mix_PlayChannel(-1, dribble, 0);
+            }
             currFrameTime = 0;
         }
         else {
@@ -87,6 +253,9 @@ void BlackPlayer::update() {
             frame = 0;
         }
         pTexture = dribblingTextures[frame];
+        if(frame == 10) {
+            Mix_PlayChannel(-1, dribble, 0);
+        }
         frame++;
     }
     else if(hasTheBall && isJumping) {
@@ -102,16 +271,12 @@ void BlackPlayer::update() {
         }
         pTexture = shootingTextures[frame];
     }
-    else if(!hasTheBall && isJumping) {
-        frame = 5;
-        pTexture = jumpingTextures[frame];
-    }
 
 }
 
 void BlackPlayer::setRunningScenes() {
     for(int counter = 0; counter < RUNNING; counter++) {
-        if(!BlackPlayer::runningTextures[counter].loadFromFile(std::string("player/NormalRunning/Run.") + std::to_string(counter+2).c_str() + ".png")) {
+        if(!BlackPlayer::runningTextures[counter].loadFromFile(std::string("player/Troy/NormalRunning/Run.") + std::to_string(counter+2).c_str() + ".png")) {
             printf("Error loading running images! %s\n", SDL_GetError());
         }
     }
@@ -119,7 +284,7 @@ void BlackPlayer::setRunningScenes() {
 
 void BlackPlayer::setDefenceScenes() {
     for(int i=0; i<DEFENDING; i++) {
-        if(defenceTextures[i].loadFromFile("player/DefenceWalk/Walk_" + std::to_string(i+1) + ".png")) {
+        if(defenceTextures[i].loadFromFile("player/Troy/DefenceWalk/Walk_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
@@ -127,7 +292,7 @@ void BlackPlayer::setDefenceScenes() {
 
 void BlackPlayer::setJumpingScenes() {
     for(int i=0; i<JUMPING ; i++) {
-        if(!jumpingTextures[i].loadFromFile("player/Jump/Jump_" + std::to_string(i+1) + ".png")) {
+        if(!jumpingTextures[i].loadFromFile("player/Troy/Jump/Jump_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
@@ -135,7 +300,7 @@ void BlackPlayer::setJumpingScenes() {
 
 void BlackPlayer::setDribblingScenes() {
     for(int i=0; i<DRIBBLING; i++) {
-        if(!dribblingTextures[i].loadFromFile("player/Dribble/Dribble_" + std::to_string(i+1) + ".png")) {
+        if(!dribblingTextures[i].loadFromFile("player/Troy/Dribble/Dribble_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
@@ -143,7 +308,7 @@ void BlackPlayer::setDribblingScenes() {
 
 void BlackPlayer::setStandDribbleScenes() {
     for(int i=0; i<STANDDRIBBLE; i++) {
-        if(!standDribbleTextures[i].loadFromFile("player/StandingDribble/Dribble_" + std::to_string(i+1) + ".png")) {
+        if(!standDribbleTextures[i].loadFromFile("player/Troy/StandingDribble/Dribble_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
@@ -151,7 +316,15 @@ void BlackPlayer::setStandDribbleScenes() {
 
 void BlackPlayer::setShootingScenes() {
     for(int i=0; i<SHOOT; i++) {
-        if(!shootingTextures[i].loadFromFile("player/Shoot/Shot_" + std::to_string(i+1) + ".png")) {
+        if(!shootingTextures[i].loadFromFile("player/Troy/Shoot/Shot_" + std::to_string(i+1) + ".png")) {
+            printf("%s\n", SDL_GetError());
+        }
+    }
+}
+
+void BlackPlayer::setScoreIndicator() {
+    for(int i=0; i<SCORE; i++) {
+        if(!scoreTextures[i].loadFromFile("background/score/Troy/" + std::to_string(i) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }

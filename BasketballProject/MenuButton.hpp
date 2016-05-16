@@ -7,9 +7,11 @@ enum MenuButtons {
     PLAY = 0,
     OPTIONS = 1,
     EXIT = 2,
-    RESUME = 3,
-    MAIN_MENU = 4,
-    TOTAL_MENU_BUTTONS = 5
+    BACK = 3,
+    NEW_GAME = 4,
+    RESUME = 5,
+    MAIN_MENU = 6,
+    TOTAL_MENU_BUTTONS = 7
 };
 
 class MenuButton : public Button {

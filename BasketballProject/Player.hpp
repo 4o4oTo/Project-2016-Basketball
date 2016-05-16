@@ -32,6 +32,7 @@ protected:
     bool isGoingAway;
     bool movingLeft;
     bool movingRight;
+    bool isTheWinner;
     int frame;
     int currFrameTime;
     bool positioned;
@@ -52,7 +53,7 @@ protected:
     Ball* ball;
     Mix_Chunk* dribble;
     int pScore;
-    SDL_Rect scoreIndicatorPos;
+    SDL_Rect scoreIndicatorDim;
 public:
     Player(std::string name, float jumpPower);
 
@@ -101,6 +102,10 @@ public:
     bool hasBall();
 
     bool isJumpin();
+
+    bool hasWon();
+
+    void setVictory(bool v);
 
     bool isLastFrame(int frames_count);
 

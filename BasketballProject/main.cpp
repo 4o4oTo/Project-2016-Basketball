@@ -3,6 +3,7 @@
 #include "MusicButton.hpp"
 #include "MenuButton.hpp"
 #include "BlackPlayer.hpp"
+#include "WhitePlayer.hpp"
 #include "BasketballPole.hpp"
 #include "Ball.hpp"
 
@@ -15,6 +16,14 @@ SDL_Window* gWindow = NULL;
 
 SDL_Renderer* gRenderer = NULL;
 
+//Victory background texture
+Texture gVictoryBackgroundTexture;
+SDL_Rect gVictoryBackgroundClip;
+Texture gVictoryText;
+MenuButton gNewGameButton;
+bool gameOver = false;
+Mix_Chunk *gCheer;
+
 //Reset the game
 bool resetGame = false;
 
@@ -24,14 +33,15 @@ bool gamePaused = false;
 //Music
 Mix_Music* gMusic = NULL;
 MusicButton gMusicButton;
-MenuButton gOptionButton;
-Texture gOptionText[20];
+
 //Menu Background Texture
 Texture gBackgroundTexture;
 SDL_Rect gBackgroundClip;
 
 //Menu Buttons
 MenuButton gMenuButtons[TOTAL_MENU_BUTTONS];
+MenuButton gOptionButton;
+Texture gOptionText[17];
 
 //Font
 TTF_Font* gFont = NULL;
@@ -42,6 +52,7 @@ SDL_Rect gCourtClip;
 
 //Player
 BlackPlayer troy("Troy");
+WhitePlayer zac("Zac");
 
 //Entities
 BasketballPole gBasketballPole;
@@ -81,17 +92,21 @@ int main(int argc, char* argv[]) {
                             gamePaused = false;
                         }
                     }
-                    if(!gamePaused && !gMenuButtons[OPTIONS].isClicked()) {
+                    if(!gamePaused && !gameOver && !gMenuButtons[OPTIONS].isClicked()) {
                         for(int i = PLAY; i < EXIT+1; i++) {
                             gMenuButtons[i].handleEvents(&e);
                         }
                     }
-                    else if(gamePaused && !gMenuButtons[OPTIONS].isClicked()){
+                    else if(gamePaused && !gameOver && !gMenuButtons[OPTIONS].isClicked()){
                         for(int i = RESUME; i < TOTAL_MENU_BUTTONS; i++) {
                             gMenuButtons[i].handleEvents(&e);
                         }
                     }
-                    if(gMenuButtons[OPTIONS].isClicked()) {
+                    else if(gameOver) {
+                        gNewGameButton.handleEvents(&e);
+                        gMenuButtons[MAIN_MENU].handleEvents(&e);
+                    }
+                    else if(gMenuButtons[OPTIONS].isClicked()) {
                         gOptionButton.handleEvents(&e);
                     }
 
@@ -99,39 +114,70 @@ int main(int argc, char* argv[]) {
 
                     if(gMenuButtons[PLAY].isClicked()) {
                         troy.handleEvents(&e);
+                        zac.handleEvents(&e);
                         gBall.handleEvents(&e);
                     }
                 }
+
                 SDL_RenderClear(gRenderer);
 
                 if(gMenuButtons[PLAY].isClicked()) {
-                    if(!gamePaused) {
+                    if(!gamePaused && !gameOver) {
                         if(resetGame) {
                             troy.setNormalStance();
                             troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
                             troy.setFacingDirection(RIGHT);
+                            zac.setNormalStance();
+                            zac.setInitialPosition((SCREEN_WIDTH - (zac.getTexture().getWidth())/3),(SCREEN_HEIGHT - zac.getTextureRealHeight()));
+                            zac.setFacingDirection(RIGHT);
                             gBall.setPosition(100, SCREEN_HEIGHT - gBall.getTexture().getHeight());
                             gBall.setVelocity(0.0, 0.0);
                             troy.setInitialScore();
+                            zac.setInitialScore();
                             resetGame = false;
                         }
                         while(totalFrameTime >= TIME_PER_FRAME) {
                             troy.update();
+                            zac.update();
                             gBall.update();
                             troy.checkBallCollision();
+                            zac.checkBallCollision();
                             troy.checkBasketballPoleCollision(&gBasketballPole);
+                            zac.checkBasketballPoleCollision(&gBasketballPole);
                             totalFrameTime -= TIME_PER_FRAME;
                         }
                         if(!gBall.isPossessed()) {
                             gBall.checkCollisionWithPole();
                         }
-                        gCourt.render(0, 0, &gCourtClip);
-                        troy.render();
+                        gCourt.render(0, 0, &gCourtClip);\
+                        if(troy.isBehindPlayer(&zac)) {
+                            troy.render();
+                            zac.render();
+                        }
+                        else {
+                            zac.render();
+                            troy.render();
+                        }
                         gBall.render();
                         gBasketballPole.render();
                         troy.renderScoreIndicator();
+                        zac.renderScoreIndicator();
+                        if(troy.hasWon() || zac.hasWon()) {
+                            gameOver = true;
+                            SDL_Color textColor = {255, 0, 0, 0};
+                            if(troy.hasWon()) {
+                               gVictoryText.loadFromRenderedText(troy.getName() + " has won!", textColor);
+                                troy.setVictory(false);
+                            }
+                            else {
+                                gVictoryText.loadFromRenderedText(zac.getName() + " has won!", textColor);
+                                zac.setVictory(false);
+                            }
+
+                            Mix_PlayChannel(-1, gCheer, 0);
+                        }
                     }
-                    else {
+                    else if(gamePaused && !gameOver){
                         gBackgroundTexture.render(0, 0, &gBackgroundClip);
                         gMenuButtons[RESUME].render();
                         gMenuButtons[MAIN_MENU].render();
@@ -142,6 +188,22 @@ int main(int argc, char* argv[]) {
                         else if(gMenuButtons[MAIN_MENU].isClicked()) {
                             gMenuButtons[PLAY].unclick();
                             gamePaused = false;
+                            gMenuButtons[MAIN_MENU].unclick();
+                        }
+                    }
+                    else if(gameOver) {
+                        gVictoryBackgroundTexture.render(0, 0, &gVictoryBackgroundClip);
+                        gVictoryText.render(100, 200);
+                        gNewGameButton.render();
+                        gMenuButtons[MAIN_MENU].render();
+                        if(gNewGameButton.isClicked()) {
+                            gameOver = false;
+                            resetGame = true;
+                            gNewGameButton.unclick();
+                        }
+                        else if(gMenuButtons[MAIN_MENU].isClicked()) {
+                            gMenuButtons[PLAY].unclick();
+                            gameOver = false;
                             gMenuButtons[MAIN_MENU].unclick();
                         }
                     }
@@ -252,6 +314,8 @@ bool init() {
 bool loadMedia() {
     bool success = true;
 
+    SDL_Color textColor = {0, 0, 0, 0};
+
     if(!gBackgroundTexture.loadFromFile("background/background.jpg")) {
         printf("%s\n", SDL_GetError());
         success = false;
@@ -261,6 +325,17 @@ bool loadMedia() {
         gBackgroundClip.w = SCREEN_WIDTH;
         gBackgroundClip.x = SCREEN_WIDTH*0.2;
         gBackgroundClip.y = SCREEN_HEIGHT*0.4;
+    }
+
+    if(!gVictoryBackgroundTexture.loadFromFile("background/victory_background.jpg")) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        gVictoryBackgroundClip.h = SCREEN_HEIGHT;
+        gVictoryBackgroundClip.w = SCREEN_WIDTH;
+        gVictoryBackgroundClip.x = 0;
+        gVictoryBackgroundClip.y = 0;
     }
 
     if(!gCourt.loadFromFile("background/court2.png")) {
@@ -290,13 +365,18 @@ bool loadMedia() {
         success = false;
     }
 
+    gCheer = Mix_LoadWAV("music/Cheer.wav");
+    if(gCheer == NULL) {
+        printf("%s\n", Mix_GetError());
+        success = false;
+    }
+
     gFont = TTF_OpenFont("font/Pacifico.ttf", 60);
     if(gFont == NULL) {
         printf("%s\n", TTF_GetError());
         success = false;
     }
     else {
-        SDL_Color textColor = {0, 0, 0};
         //Play
         if(!gMenuButtons[PLAY].loadTextureFromText("Play", textColor)) {
             success = false;
@@ -314,20 +394,13 @@ bool loadMedia() {
             gMenuButtons[OPTIONS].setDimensions(SCREEN_WIDTH*0.25, SCREEN_HEIGHT*0.5, gMenuButtons[OPTIONS].getWidth(), gMenuButtons[OPTIONS].getHeight());
             gMenuButtons[OPTIONS].setCurrentButton(OPTIONS);
         }
+
         if(!gOptionButton.loadTextureFromText("Back" , textColor)) {
             success = false;
         }
         else {
             gOptionButton.setDimensions(SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.85, gOptionButton.getWidth(), gOptionButton.getHeight());
         }   gOptionButton.setCurrentButton(BACK);
-        //Exit
-        if(!gMenuButtons[EXIT].loadTextureFromText("Exit", textColor)) {
-            success = false;
-        }
-        else {
-            gMenuButtons[EXIT].setDimensions(SCREEN_WIDTH*0.59, SCREEN_HEIGHT*0.5, gMenuButtons[EXIT].getWidth(), gMenuButtons[EXIT].getHeight());
-            gMenuButtons[EXIT].setCurrentButton(EXIT);
-        }
 
         if(!gOptionText[0].loadFromRenderedText("Controls :", textColor)) {
             success = false;
@@ -381,6 +454,15 @@ bool loadMedia() {
             success = false;
         }
 
+        //Exit
+        if(!gMenuButtons[EXIT].loadTextureFromText("Exit", textColor)) {
+            success = false;
+        }
+        else {
+            gMenuButtons[EXIT].setDimensions(SCREEN_WIDTH*0.59, SCREEN_HEIGHT*0.5, gMenuButtons[EXIT].getWidth(), gMenuButtons[EXIT].getHeight());
+            gMenuButtons[EXIT].setCurrentButton(EXIT);
+        }
+
         //Resume
         if(!gMenuButtons[RESUME].loadTextureFromText("Resume", textColor)) {
             success = false;
@@ -399,6 +481,15 @@ bool loadMedia() {
             gMenuButtons[MAIN_MENU].setCurrentButton(MAIN_MENU);
         }
 
+        //New game
+        if(!gNewGameButton.loadTextureFromText("New Game", textColor)) {
+            printf("%s\n", TTF_GetError());
+            success = false;
+        }
+        else {
+            gNewGameButton.setDimensions(SCREEN_WIDTH*0.25, SCREEN_HEIGHT*0.5, gNewGameButton.getWidth(), gNewGameButton.getHeight());
+            gNewGameButton.setCurrentButton(NEW_GAME);
+        }
     }
 
     if(!gBasketballPole.getTexture().loadFromFile("entity/BasketballPole/BasketballPole.png")) {
@@ -433,8 +524,8 @@ bool loadMedia() {
     }
     else {
         troy.setTextureRealDimensions(100,290);
-        troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
-        troy.setFacingDirection(RIGHT);
+//        troy.setInitialPosition((SCREEN_WIDTH - troy.getTexture().getWidth())/2,(SCREEN_HEIGHT - troy.getTextureRealHeight()));
+//        troy.setFacingDirection(RIGHT);
         if(troy.setDefenceStance("player/Troy/DefenceStance/DefenceStance.png")) {
             troy.setDefenceScenes();
         }
@@ -449,6 +540,28 @@ bool loadMedia() {
         troy.setInitialScore();
     }
 
+    if(!zac.setNormalStance("player/Zac/Jump/Jump_1.png") || !zac.loadSoundEffects()) {
+        printf("%s\n", SDL_GetError());
+        success = false;
+    }
+    else {
+        zac.setTextureRealDimensions(100,290);
+//        zac.setInitialPosition((SCREEN_WIDTH - (zac.getTexture().getWidth())/3),(SCREEN_HEIGHT - zac.getHeight()));
+//        zac.setFacingDirection(LEFT);
+        if(zac.setDefenceStance("player/Zac/DefenceStance/Stance.png")) {
+            zac.setDefenceScenes();
+        }
+        zac.setRunningScenes();
+        zac.setJumpingScenes();
+        zac.setDribblingScenes();
+        zac.setStandDribbleScenes();
+        zac.setShootingScenes();
+        zac.passTheBall(&gBall);
+        zac.setScoreIndicator();
+        zac.setScoreIndicatorPosition(troy.getScoreIndicator().x + troy.getScoreIndicator().w, 90);
+        zac.setInitialScore();
+    }
+
     return success;
 }
 
@@ -457,7 +570,7 @@ void shutdown() {
     gCourt.free();
     gBackgroundTexture.free();
     gBasketballPole.free();
-    for(int i=0; i<3; i++) {
+    for(int i=0; i<TOTAL_MENU_BUTTONS; i++) {
         gMenuButtons[i].free();
     }
 

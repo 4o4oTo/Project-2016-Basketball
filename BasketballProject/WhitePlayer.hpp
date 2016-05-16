@@ -1,17 +1,17 @@
-#ifndef BLACK_PLAYER_HPP
-#define BLACK_PLAYER_HPP
+#ifndef WHITE_PLAYER_HPP
+#define WHITE_PLAYER_HPP
 
 #include "Player.hpp"
 
-#define RUNNING 18
-#define DEFENDING 13
-#define JUMPING 6
-#define DRIBBLING 21
+#define RUNNING 19
+#define DEFENDING 10
+#define JUMPING 7
+#define DRIBBLING 19
 #define STANDDRIBBLE 22
-#define SHOOT 5
+#define SHOOT 4
 #define SCORE 22
 
-class BlackPlayer : public Player {
+class WhitePlayer : public Player {
     int frameTime;
     //int currFrameTime;
     Texture runningTextures[RUNNING];
@@ -21,8 +21,9 @@ class BlackPlayer : public Player {
     Texture standDribbleTextures[STANDDRIBBLE];
     Texture shootingTextures[SHOOT];
     Texture scoreTextures[SCORE];
+    bool stancePositioned;
 public:
-    BlackPlayer(std::string name);
+    WhitePlayer(std::string name);
 
     void free();
 
@@ -46,9 +47,7 @@ public:
 
     void handleEvents(SDL_Event* e);
 
-    bool isBehindPlayer(Player *p);
-
     SDL_Rect& getScoreIndicator();
 };
 
-#endif
+#endif // WHITE_PLAYER_HPP

@@ -151,18 +151,16 @@ void Ball::setChangedDimensions(float w, float h) {
 
 void Ball::handleEvents(SDL_Event* e) {
     if(e->type == SDL_KEYDOWN) {
-        switch(e->key.keysym.sym) {
-            case SDLK_r:
-                if(possessed && !thrown && bVelX == 0.0 && bVelY == 0.0) {
-                    bVelX = bouncePower;
-                    bVelY = -bouncePower;
-                    firstRotation = true;
-                    rotationAngle = 0.0;
-                }
-                break;
+        if(e->key.keysym.sym == SDLK_r || e->key.keysym.sym == SDLK_RETURN) {
+            if(possessed && !thrown && bVelX == 0.0 && bVelY == 0.0) {
+                bVelX = bouncePower;
+                bVelY = -bouncePower;
+                firstRotation = true;
+                rotationAngle = 0.0;
+            }
         }
     }
-    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_r && thrown) {
+    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_r || e->key.keysym.sym == SDLK_RETURN) && thrown) {
         bInitialY = SCREEN_HEIGHT - bTexture.getHeight();
         possessed = false;
     }
@@ -181,7 +179,7 @@ void Ball::render() {
 
 void Ball::processInput() {
     const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-    if(keyState[SDL_SCANCODE_R]) {
+    if(keyState[SDL_SCANCODE_R] || keyState[SDL_SCANCODE_RETURN]) {
         if(possessed && !thrown) {
             if(bBall.x < 700) {
                 bVelX += bGravity*2.5;

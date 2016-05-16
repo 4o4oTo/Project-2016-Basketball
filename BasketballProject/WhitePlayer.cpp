@@ -1,45 +1,54 @@
-#include "BlackPlayer.hpp"
+#include "WhitePlayer.hpp"
 
-BlackPlayer::BlackPlayer(std::string name) : Player::Player(name, -10.0) {
+WhitePlayer::WhitePlayer(std::string name) : Player::Player(name, -10.0) {
     frameTime = 2;
     //currFrameTime = 0;
     pJumpPower = -10.0;
     pMovementSpeed = 10;
+//    stancePositioned = false;
 }
 
-void BlackPlayer::setInitialScore() {
+void WhitePlayer::setInitialScore() {
     pCurrentScore = scoreTextures[0];
     pScore = 0;
 }
 
-SDL_Rect& BlackPlayer::getScoreIndicator() {
+SDL_Rect& WhitePlayer::getScoreIndicator() {
     return scoreIndicatorDim;
 }
 
-void BlackPlayer::handleEvents(SDL_Event* e) {
+void WhitePlayer::handleEvents(SDL_Event* e) {
     if(e->type == SDL_KEYDOWN) {
         switch(e->key.keysym.sym) {
-            case SDLK_d:
+            case SDLK_RIGHT:
                 if(facing == LEFT && hasLanded) {
                     frame = 0;
                     currFrameTime = 0;
                     movingRight = true;
                 }
-                isRunning = true;
                 isStanding = false;
+                isRunning = true;
+//                if(stancePositioned) {
+//                    stancePositioned = false;
+//                    pPos.y += 10;
+//                }
                 break;
 
-            case SDLK_a:
+            case SDLK_LEFT:
                 if(facing == RIGHT && hasLanded) {
                     frame = 0;
                     currFrameTime = 0;
                     movingLeft = true;
                 }
-                isRunning = true;
                 isStanding = false;
+                isRunning = true;
+//                if(stancePositioned) {
+//                    stancePositioned = false;
+//                    pPos.y += 10;
+//                }
                 break;
 
-            case SDLK_LSHIFT:
+            case SDLK_KP_0:
                 if(!isDefending && !isJumping && !hasTheBall) {
                     frame = 0;
                     currFrameTime = 0;
@@ -47,10 +56,18 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
                     if(pMovementSpeed != 3) {
                         pMovementSpeed = 3;
                     }
+//                    if(stancePositioned) {
+//                        stancePositioned = false;
+//                        pPos.y += 10;
+//                    }
                 }
                 break;
-            case SDLK_SPACE:
+            case SDLK_RSHIFT:
                 if(!isJumping) {
+//                    if(stancePositioned) {
+//                        stancePositioned = false;
+//                        pPos.y += 10;
+//                    }
                     if(hasTheBall) {
                         pShotPosition = pPos.x + getTextureRealWidth()*2;
                         ball->setVelocity(0, 0);
@@ -77,15 +94,23 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
                 }
                 break;
 
-            case SDLK_w:
+            case SDLK_UP:
                 if(!isJumping) {
+//                    if(stancePositioned) {
+//                        stancePositioned = false;
+//                        pPos.y += 10;
+//                    }
                     isChangingPerspective = true;
                     ball->changingPerspective(true);
                     isGoingAway = true;
                 }
                 break;
 
-            case SDLK_s:
+            case SDLK_DOWN:
+//                if(stancePositioned) {
+//                    stancePositioned = false;
+//                    pPos.y += 10;
+//                }
                 if(!isJumping) {
                     isChangingPerspective = true;
                     ball->changingPerspective(true);
@@ -94,7 +119,7 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
                 break;
         }
     }
-    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_a || e->key.keysym.sym == SDLK_d) && hasLanded) {
+    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_LEFT || e->key.keysym.sym == SDLK_RIGHT) && hasLanded) {
         pVelX = 0.0;
         frame = 0;
         currFrameTime = 0;
@@ -107,14 +132,14 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
             pPos.y -= 20;
             positioned = false;
         }
-        if(e->key.keysym.sym == SDLK_a) {
+        if(e->key.keysym.sym == SDLK_LEFT) {
             movingLeft = false;
         }
         else {
             movingRight = false;
         }
     }
-    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_LSHIFT && hasLanded && !hasTheBall) {
+    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_KP_0 && hasLanded && !hasTheBall) {
         isDefending = false;
         frame = 0;
         currFrameTime = 0;
@@ -127,12 +152,12 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
             pTexture = pNormalStance;
         }
     }
-    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_r && isJumping && hasTheBall && facing == RIGHT) {
+    else if(e->type == SDL_KEYUP && e->key.keysym.sym == SDLK_RETURN && isJumping && hasTheBall && facing == RIGHT) {
         hasThrownTheBall = true;
         hasTheBall = false;
         ball->setIsThrown(true);
     }
-    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_w || e->key.keysym.sym == SDLK_s) && hasLanded) {
+    else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_UP || e->key.keysym.sym == SDLK_DOWN) && hasLanded) {
         pVelY = 0.0;
 //        frame = 0;
 //        currFrameTime = 0;
@@ -146,7 +171,7 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
         if(!hasTheBall) {
             pTexture = pNormalStance;
         }
-        if(e->key.keysym.sym == SDLK_w) {
+        if(e->key.keysym.sym == SDLK_UP) {
             isGoingAway = false;
         }
         else {
@@ -157,7 +182,7 @@ void BlackPlayer::handleEvents(SDL_Event* e) {
     }
 }
 
-void BlackPlayer::update() {
+void WhitePlayer::update() {
 
     Player::processInput();
 
@@ -286,69 +311,65 @@ void BlackPlayer::update() {
         }
         pTexture = shootingTextures[frame];
     }
-
-}
-
-bool BlackPlayer::isBehindPlayer(Player *p) {
-    if(isChangingPerspective && pPos.y < p->getY()) {
-        return true;
-    }
-    else {
-        return false;
+    else if(isStanding && !hasTheBall) {
+//        if(!stancePositioned) {
+//            stancePositioned = true;
+//            pPos.y -= 10;
+//        }
     }
 }
 
-void BlackPlayer::setRunningScenes() {
+void WhitePlayer::setRunningScenes() {
     for(int counter = 0; counter < RUNNING; counter++) {
-        if(!BlackPlayer::runningTextures[counter].loadFromFile(std::string("player/Troy/NormalRunning/Run.") + std::to_string(counter+2).c_str() + ".png")) {
+        if(!WhitePlayer::runningTextures[counter].loadFromFile(std::string("player/Zac/NormalRunning/Run_") + std::to_string(counter+1).c_str() + ".png")) {
             printf("Error loading running images! %s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setDefenceScenes() {
+void WhitePlayer::setDefenceScenes() {
     for(int i=0; i<DEFENDING; i++) {
-        if(defenceTextures[i].loadFromFile("player/Troy/DefenceWalk/Walk_" + std::to_string(i+1) + ".png")) {
+        if(defenceTextures[i].loadFromFile("player/Zac/DefenceWalk/Walk_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setJumpingScenes() {
+void WhitePlayer::setJumpingScenes() {
     for(int i=0; i<JUMPING ; i++) {
-        if(!jumpingTextures[i].loadFromFile("player/Troy/Jump/Jump_" + std::to_string(i+1) + ".png")) {
+        if(!jumpingTextures[i].loadFromFile("player/Zac/Jump/Jump_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setDribblingScenes() {
+void WhitePlayer::setDribblingScenes() {
     for(int i=0; i<DRIBBLING; i++) {
-        if(!dribblingTextures[i].loadFromFile("player/Troy/Dribble/Dribble_" + std::to_string(i+1) + ".png")) {
+        if(!dribblingTextures[i].loadFromFile("player/Zac/Dribble/Dribble_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setStandDribbleScenes() {
+void WhitePlayer::setStandDribbleScenes() {
     for(int i=0; i<STANDDRIBBLE; i++) {
-        if(!standDribbleTextures[i].loadFromFile("player/Troy/StandingDribble/Dribble_" + std::to_string(i+1) + ".png")) {
+        if(!standDribbleTextures[i].loadFromFile("player/Zac/StandingDribble/Dribble_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setShootingScenes() {
+void WhitePlayer::setShootingScenes() {
     for(int i=0; i<SHOOT; i++) {
-        if(!shootingTextures[i].loadFromFile("player/Troy/Shoot/Shot_" + std::to_string(i+1) + ".png")) {
+        if(!shootingTextures[i].loadFromFile("player/Zac/Shoot/Shot_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
 }
 
-void BlackPlayer::setScoreIndicator() {
+void WhitePlayer::setScoreIndicator() {
     for(int i=0; i<SCORE; i++) {
-        if(!scoreTextures[i].loadFromFile("background/score/Troy/" + std::to_string(i) + ".png")) {
+        if(!scoreTextures[i].loadFromFile("background/score/Zac/" + std::to_string(i) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }
@@ -356,26 +377,26 @@ void BlackPlayer::setScoreIndicator() {
     scoreIndicatorDim.h = scoreTextures[0].getHeight();
 }
 
-void BlackPlayer::free() {
+void WhitePlayer::free() {
     for(int i = 0; i < RUNNING; i++) {
-        BlackPlayer::runningTextures[i].free();
+        WhitePlayer::runningTextures[i].free();
     }
     for(int i = 0; i < DRIBBLING; i++) {
-        BlackPlayer::dribblingTextures[i].free();
-    }
-    for(int i = 0; i < STANDDRIBBLE; i++) {
-        BlackPlayer::standDribbleTextures[i].free();
-    }
-    for(int i = 0; i < JUMPING; i++) {
-        BlackPlayer::jumpingTextures[i].free();
+        WhitePlayer::dribblingTextures[i].free();
     }
     for(int i = 0; i < DEFENDING; i++) {
-        BlackPlayer::defenceTextures[i].free();
+        WhitePlayer::defenceTextures[i].free();
+    }
+    for(int i = 0; i < STANDDRIBBLE; i++) {
+        WhitePlayer::standDribbleTextures[i].free();
     }
     for(int i = 0; i < SHOOT; i++) {
-        BlackPlayer::shootingTextures[i].free();
+        WhitePlayer::shootingTextures[i].free();
+    }
+    for(int i = 0; i < JUMPING; i++) {
+        WhitePlayer::jumpingTextures[i].free();
     }
     for(int i = 0; i < SCORE; i++) {
-        BlackPlayer::scoreTextures[i].free();
+        WhitePlayer::scoreTextures[i].free();
     }
 }

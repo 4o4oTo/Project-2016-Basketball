@@ -24,7 +24,8 @@ bool gamePaused = false;
 //Music
 Mix_Music* gMusic = NULL;
 MusicButton gMusicButton;
-
+MenuButton gOptionButton;
+Texture gOptionText[20];
 //Menu Background Texture
 Texture gBackgroundTexture;
 SDL_Rect gBackgroundClip;
@@ -80,17 +81,19 @@ int main(int argc, char* argv[]) {
                             gamePaused = false;
                         }
                     }
-                    if(!gamePaused) {
+                    if(!gamePaused && !gMenuButtons[OPTIONS].isClicked()) {
                         for(int i = PLAY; i < EXIT+1; i++) {
                             gMenuButtons[i].handleEvents(&e);
                         }
                     }
-                    else {
+                    else if(gamePaused && !gMenuButtons[OPTIONS].isClicked()){
                         for(int i = RESUME; i < TOTAL_MENU_BUTTONS; i++) {
                             gMenuButtons[i].handleEvents(&e);
                         }
                     }
-
+                    if(gMenuButtons[OPTIONS].isClicked()) {
+                        gOptionButton.handleEvents(&e);
+                    }
 
                     gMusicButton.handleEvents(&e);
 
@@ -99,7 +102,6 @@ int main(int argc, char* argv[]) {
                         gBall.handleEvents(&e);
                     }
                 }
-
                 SDL_RenderClear(gRenderer);
 
                 if(gMenuButtons[PLAY].isClicked()) {
@@ -145,7 +147,29 @@ int main(int argc, char* argv[]) {
                     }
                 }
                 else if(gMenuButtons[OPTIONS].isClicked()) {
-
+                    gBackgroundTexture.render(0, 0, &gBackgroundClip);
+                    gOptionButton.render();
+                    if(gOptionButton.isClicked()){
+                        gMenuButtons[OPTIONS].unclick();
+                        gOptionButton.unclick();
+                    }
+                    gOptionText[0].render((SCREEN_WIDTH-gOptionText[0].getWidth())/2, 30);
+                    gOptionText[1].render(50, 100);
+                    gOptionText[2].render(20, 170);
+                    gOptionText[3].render(20, 240);
+                    gOptionText[4].render(20, 310);
+                    gOptionText[5].render(20, 380);
+                    gOptionText[6].render(20, 450);
+                    gOptionText[7].render(20, 520);
+                    gOptionText[8].render(20, 590);
+                    gOptionText[9].render(SCREEN_WIDTH - gOptionText[9].getWidth() - 40, 100);
+                    gOptionText[10].render(SCREEN_WIDTH - gOptionText[10].getWidth(), 170);
+                    gOptionText[11].render(SCREEN_WIDTH - gOptionText[11].getWidth(), 240);
+                    gOptionText[12].render(SCREEN_WIDTH - gOptionText[12].getWidth(), 310);
+                    gOptionText[13].render(SCREEN_WIDTH - gOptionText[13].getWidth(), 380);
+                    gOptionText[14].render(SCREEN_WIDTH - gOptionText[14].getWidth(), 450);
+                    gOptionText[15].render(SCREEN_WIDTH - gOptionText[15].getWidth(), 520);
+                    gOptionText[16].render(SCREEN_WIDTH - gOptionText[16].getWidth(), 590);
                 }
                 else if(gMenuButtons[EXIT].isClicked()) {
                     quit = true;
@@ -290,7 +314,12 @@ bool loadMedia() {
             gMenuButtons[OPTIONS].setDimensions(SCREEN_WIDTH*0.25, SCREEN_HEIGHT*0.5, gMenuButtons[OPTIONS].getWidth(), gMenuButtons[OPTIONS].getHeight());
             gMenuButtons[OPTIONS].setCurrentButton(OPTIONS);
         }
-
+        if(!gOptionButton.loadTextureFromText("Back" , textColor)) {
+            success = false;
+        }
+        else {
+            gOptionButton.setDimensions(SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.85, gOptionButton.getWidth(), gOptionButton.getHeight());
+        }   gOptionButton.setCurrentButton(BACK);
         //Exit
         if(!gMenuButtons[EXIT].loadTextureFromText("Exit", textColor)) {
             success = false;
@@ -298,6 +327,58 @@ bool loadMedia() {
         else {
             gMenuButtons[EXIT].setDimensions(SCREEN_WIDTH*0.59, SCREEN_HEIGHT*0.5, gMenuButtons[EXIT].getWidth(), gMenuButtons[EXIT].getHeight());
             gMenuButtons[EXIT].setCurrentButton(EXIT);
+        }
+
+        if(!gOptionText[0].loadFromRenderedText("Controls :", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[1].loadFromRenderedText("Player 1 :", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[2].loadFromRenderedText("A - Goes left", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[3].loadFromRenderedText("D - Goes right", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[4].loadFromRenderedText("W - Goes away ", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[5].loadFromRenderedText("S - Comes closer", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[6].loadFromRenderedText("Space - Jumps", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[7].loadFromRenderedText("R(hold) - Shoots", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[8].loadFromRenderedText("Shift(hold) - Defense stance", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[9].loadFromRenderedText("Player 2 :", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[10].loadFromRenderedText("Left arrow - Goes left", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[11].loadFromRenderedText("Right arrow - Goes right", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[12].loadFromRenderedText("Up arrow - Goes away", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[13].loadFromRenderedText("Down arrow - Comes closer", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[14].loadFromRenderedText("Right shift - Jumps", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[15].loadFromRenderedText("Numpad 0(hold) - Defense stance", textColor)) {
+            success = false;
+        }
+        if(!gOptionText[16].loadFromRenderedText("Enter(hold) - Shoots", textColor)) {
+            success = false;
         }
 
         //Resume

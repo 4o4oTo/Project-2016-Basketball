@@ -24,6 +24,7 @@ class Ball {
     bool firstRotation;
     bool wasChangingPerspective;
     bool hasGoneThroughTheNet;
+    bool isStolen;
     float bVelX;
     float bVelY;
     float bMaxPower;
@@ -51,6 +52,8 @@ public:
     int getY();
 
     void passThePole(BasketballPole* p);
+
+    void setIsStolen(bool s);
 
     void setPosition(int x, int y);
 
@@ -80,9 +83,13 @@ public:
 
     void setVelocity(float xVel, float yVel);
 
+    void setFirstRotation(bool f);
+
     bool isThrown();
 
     bool hasScored();
+
+    bool hasBeenStolen();
 
     bool hasCollidedWithThePole();
 

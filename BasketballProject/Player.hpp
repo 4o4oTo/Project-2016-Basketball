@@ -14,16 +14,19 @@ enum FacingDirection {
 class Player {
 protected:
     static const float pGravity;
+    static std::string lastPlayerToShoot;
     int pInitialY;
     int pShotPosition;
     float pJumpPower;
     float pMovementSpeed;
     bool isDefending;
+    bool isStealing;
     bool isRunning;
     bool isChangingPerspective;
     bool hasLanded;
     bool isStanding;
     bool isJumping;
+    bool hasStolenTheBall;
     bool hasTheBall;
     bool hadTheBallBeforeJump;
     bool hasThrownTheBall;
@@ -79,9 +82,15 @@ public:
 
     virtual void update() = 0;
 
+    void checkPlayerCollision(Player *p);
+
     void setInitialPosition(int x, int y);
 
+    void setHasStolenTheBall(bool s);
+
     bool loadSoundEffects();
+
+    FacingDirection isFacing();
 
     void passTheBall(Ball* b);
 
@@ -95,6 +104,8 @@ public:
 
     void processInput();
 
+    bool isDef();
+
     bool isBelowRim();
 
     bool isBehindRim();
@@ -103,9 +114,13 @@ public:
 
     bool isJumpin();
 
+    bool isStealingBall();
+
     bool hasWon();
 
     void setVictory(bool v);
+
+    void setIsStealingBall(bool i);
 
     bool isLastFrame(int frames_count);
 
@@ -138,6 +153,8 @@ public:
     int getWidth();
 
     int getHeight();
+
+    int getInitialY();
 
     Texture& getTexture();
 

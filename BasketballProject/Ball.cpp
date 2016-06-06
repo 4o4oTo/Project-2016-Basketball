@@ -16,6 +16,7 @@ Ball::Ball(float bounce) : bGravity(0.3){
     firstRotation = true;
     wasChangingPerspective = false;
     hasGoneThroughTheNet = false;
+    isStolen = false;
     bBall.x = 0;
     bBall.y = 0;
     changedHeight = 0.0;
@@ -69,8 +70,16 @@ bool Ball::loadSoundEffects() {
     return success;
 }
 
+bool Ball::hasBeenStolen() {
+    return isStolen;
+}
+
 void Ball::passThePole(BasketballPole* p) {
     pole = p;
+}
+
+void Ball::setFirstRotation(bool f) {
+    firstRotation = f;
 }
 
 void Ball::setHasScored(bool h) {
@@ -149,6 +158,10 @@ void Ball::setChangedDimensions(float w, float h) {
     }
 }
 
+void Ball::setIsStolen(bool s) {
+    isStolen = s;
+}
+
 void Ball::handleEvents(SDL_Event* e) {
     if(e->type == SDL_KEYDOWN) {
         if(e->key.keysym.sym == SDLK_r || e->key.keysym.sym == SDLK_RETURN) {
@@ -225,6 +238,9 @@ void Ball::update() {
     if(possessed && hitBoard) {
         hitBoard = false;
     }
+    if(isStolen) {
+        bInitialY = SCREEN_HEIGHT - bTexture.getHeight();
+    }
     if(thrown && !possessed) {
         if(!hasCollidedWithThePole()) {
             if(abs(changedWidth-53.0) > 0.00001) {
@@ -266,6 +282,33 @@ void Ball::update() {
             bBall.y += bVelY;
         }
         //checkCollision();
+    }
+    else if(isStolen && !possessed) {
+        if(bBall.y + bTexture.getHeight() > bInitialY + bTexture.getHeight()) {
+            checkCollision(0, bInitialY + bTexture.getHeight());
+            Mix_PlayChannel(-1, dribble, 0);
+        }
+        if(rotationAngle > 0) {
+            rotationAngle += 8;
+        }
+        else {
+            rotationAngle -= 8;
+        }
+        bVelY += bGravity*1.5;
+        if(bVelX - bGravity/15 > 1) {
+            bVelX -= bGravity/15;
+        }
+        else if(bVelX + bGravity/15 < 1) {
+            bVelX += bGravity/15;
+        }
+        if((abs(bVelX-0.0) < 0.00001) && (abs(bVelY-0.0) < 0.00001) && bBall.y >= bInitialY) {
+            bBall.y = bInitialY;
+            isStolen = false;
+        }
+        else {
+            bBall.x += bVelX;
+            bBall.y += bVelY;
+        }
     }
 }
 
@@ -350,7 +393,7 @@ void Ball::checkCollisionWithPole() {
 }
 
 void Ball::checkCollision(int x, int y) {
-    if(bBall.x <= 0) {
+    if(bBall.x < 0) {
         bBall.x = 0;
         bVelX = -bVelX;
         rotationAngle = -rotationAngle;

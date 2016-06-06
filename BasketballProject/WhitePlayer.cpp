@@ -112,9 +112,19 @@ void WhitePlayer::handleEvents(SDL_Event* e) {
 //                    pPos.y += 10;
 //                }
                 if(!isJumping) {
-                    isChangingPerspective = true;
-                    ball->changingPerspective(true);
-                    isComingCloser = true;
+                    if(pPos.y < 478) {
+                        isChangingPerspective = true;
+                        if(hasTheBall) {
+                            ball->changingPerspective(true);
+                        }
+                        isComingCloser = true;
+                    }
+                }
+                break;
+
+            case SDLK_RCTRL:
+                if(isDefending) {
+                    isStealing = true;
                 }
                 break;
         }
@@ -156,14 +166,17 @@ void WhitePlayer::handleEvents(SDL_Event* e) {
         hasThrownTheBall = true;
         hasTheBall = false;
         ball->setIsThrown(true);
+        lastPlayerToShoot = pName;
     }
     else if(e->type == SDL_KEYUP && (e->key.keysym.sym == SDLK_UP || e->key.keysym.sym == SDLK_DOWN) && hasLanded) {
         pVelY = 0.0;
-//        frame = 0;
+        frame = 0;
 //        currFrameTime = 0;
         if((pPos.y == 478 && !isDefending)) {
             isChangingPerspective = false;
-            ball->changingPerspective(false);
+            if(hasTheBall) {
+                ball->changingPerspective(false);
+            }
         }
         else if(pPos.y == 498 && isDefending) {
             isChangingPerspective = false;
@@ -186,7 +199,7 @@ void WhitePlayer::update() {
 
     Player::processInput();
 
-    if(hadTheBallBeforeJump && ball->hasScored() && !hasScored) {
+    if(lastPlayerToShoot.c_str() == pName && ball->hasScored() && !hasScored) {
         if((pShotPosition <= 553 && !isChangingPerspective)
                 || (isChangingPerspective && pInitialY == 403)
                 || (isChangingPerspective && pShotPosition <= 553)){
@@ -245,8 +258,26 @@ void WhitePlayer::update() {
             positioned = true;
         }
     }
-    else if(isDefending && isStanding && !hasTheBall) {
+    else if(isDefending && isStanding && !hasTheBall && !isStealing) {
         pTexture = pDefenceStance;
+        if(!positioned) {
+            pPos.y += 20;
+            positioned = true;
+        }
+    }
+    else if(isDefending && isStanding && !hasTheBall && isStealing) {
+        if(currFrameTime == frameTime) {
+            frame++;
+            currFrameTime = 0;
+        }
+        else {
+             currFrameTime++;
+        }
+        if(isLastFrame(STEALING)) {
+            frame = 0;
+            isStealing = false;
+        }
+        pTexture = stealingTextures[frame];
         if(!positioned) {
             pPos.y += 20;
             positioned = true;
@@ -362,6 +393,14 @@ void WhitePlayer::setStandDribbleScenes() {
 void WhitePlayer::setShootingScenes() {
     for(int i=0; i<SHOOT; i++) {
         if(!shootingTextures[i].loadFromFile("player/Zac/Shoot/Shot_" + std::to_string(i+1) + ".png")) {
+            printf("%s\n", SDL_GetError());
+        }
+    }
+}
+
+void WhitePlayer::setStealingScenes() {
+    for(int i=0; i<STEALING; i++) {
+        if(stealingTextures[i].loadFromFile("player/Zac/Stealing/Steal_" + std::to_string(i+1) + ".png")) {
             printf("%s\n", SDL_GetError());
         }
     }

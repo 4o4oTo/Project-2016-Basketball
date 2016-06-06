@@ -8,6 +8,8 @@
 #include <SDL_mixer.h>
 #include <windows.h>
 #include <math.h>
+#include <cstdlib>
+#include <time.h>
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;

@@ -2,7 +2,7 @@
 1461142232 source:d:\games\codeblocksprojects\basketballproject\texture.cpp
 	"Texture.hpp"
 
-1463431956 source:d:\games\codeblocksprojects\basketballproject\main.cpp
+1465194167 source:d:\games\codeblocksprojects\basketballproject\main.cpp
 	"Texture.hpp"
 	"main.hpp"
 	"MusicButton.hpp"
@@ -340,7 +340,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1460914529 d:\games\codeblocksprojects\basketballproject\main.hpp
+1465191528 d:\games\codeblocksprojects\basketballproject\main.hpp
 	<string>
 	<SDL_image.h>
 	<SDL.h>
@@ -349,6 +349,8 @@
 	<SDL_mixer.h>
 	<windows.h>
 	<math.h>
+	<cstdlib>
+	<time.h>
 
 1454366534 d:\games\codeblocksprojects\ttf_dev_lib\include\sdl2\sdl_ttf.h
 	"SDL.h"
@@ -388,10 +390,10 @@
 1458770518 source:d:\games\codeblocksprojects\basketballproject\troy.cpp
 	"Troy.hpp"
 
-1463426555 source:d:\games\codeblocksprojects\basketballproject\player.cpp
+1465197335 source:d:\games\codeblocksprojects\basketballproject\player.cpp
 	"Player.hpp"
 
-1463419119 d:\games\codeblocksprojects\basketballproject\player.hpp
+1465197514 d:\games\codeblocksprojects\basketballproject\player.hpp
 	"main.hpp"
 	"Texture.hpp"
 	"BasketballPole.hpp"
@@ -401,10 +403,10 @@
 	"main.hpp"
 	"Player.hpp"
 
-1463426877 source:d:\games\codeblocksprojects\basketballproject\blackplayer.cpp
+1465192822 source:d:\games\codeblocksprojects\basketballproject\blackplayer.cpp
 	"BlackPlayer.hpp"
 
-1463426175 d:\games\codeblocksprojects\basketballproject\blackplayer.hpp
+1465171116 d:\games\codeblocksprojects\basketballproject\blackplayer.hpp
 	"Player.hpp"
 
 1460120451 source:d:\games\codeblocksprojects\basketballproject\basketballpole.cpp
@@ -414,17 +416,17 @@
 	"main.hpp"
 	"Texture.hpp"
 
-1463426975 source:d:\games\codeblocksprojects\basketballproject\ball.cpp
+1465197310 source:d:\games\codeblocksprojects\basketballproject\ball.cpp
 	"Ball.hpp"
 
-1463263368 d:\games\codeblocksprojects\basketballproject\ball.hpp
+1465197283 d:\games\codeblocksprojects\basketballproject\ball.hpp
 	"main.hpp"
 	"Texture.hpp"
 	"BasketballPole.hpp"
 
-1463418932 d:\games\codeblocksprojects\basketballproject\whiteplayer.hpp
+1465171123 d:\games\codeblocksprojects\basketballproject\whiteplayer.hpp
 	"Player.hpp"
 
-1463426848 source:d:\games\codeblocksprojects\basketballproject\whiteplayer.cpp
+1465192827 source:d:\games\codeblocksprojects\basketballproject\whiteplayer.cpp
 	"WhitePlayer.hpp"
 

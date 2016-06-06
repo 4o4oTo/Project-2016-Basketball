@@ -10,6 +10,7 @@
 #define STANDDRIBBLE 22
 #define SHOOT 4
 #define SCORE 22
+#define STEALING 10
 
 class WhitePlayer : public Player {
     int frameTime;
@@ -21,6 +22,7 @@ class WhitePlayer : public Player {
     Texture standDribbleTextures[STANDDRIBBLE];
     Texture shootingTextures[SHOOT];
     Texture scoreTextures[SCORE];
+    Texture stealingTextures[STEALING];
     bool stancePositioned;
 public:
     WhitePlayer(std::string name);
@@ -38,6 +40,8 @@ public:
     void setShootingScenes();
 
     void setStandDribbleScenes();
+
+    void setStealingScenes();
 
     void setScoreIndicator();
 

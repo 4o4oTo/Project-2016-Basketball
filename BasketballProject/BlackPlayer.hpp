@@ -10,6 +10,7 @@
 #define STANDDRIBBLE 22
 #define SHOOT 5
 #define SCORE 22
+#define STEALING 10
 
 class BlackPlayer : public Player {
     int frameTime;
@@ -21,6 +22,7 @@ class BlackPlayer : public Player {
     Texture standDribbleTextures[STANDDRIBBLE];
     Texture shootingTextures[SHOOT];
     Texture scoreTextures[SCORE];
+    Texture stealingTextures[STEALING];
 public:
     BlackPlayer(std::string name);
 
@@ -37,6 +39,8 @@ public:
     void setShootingScenes();
 
     void setStandDribbleScenes();
+
+    void setStealingScenes();
 
     void setScoreIndicator();
 

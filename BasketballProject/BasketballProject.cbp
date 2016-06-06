@@ -60,6 +60,8 @@
 		<Unit filename="Player.hpp" />
 		<Unit filename="Texture.cpp" />
 		<Unit filename="Texture.hpp" />
+		<Unit filename="WhitePlayer.cpp" />
+		<Unit filename="WhitePlayer.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.hpp" />
 		<Extensions>

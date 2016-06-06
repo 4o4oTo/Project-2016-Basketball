@@ -8,7 +8,7 @@
 #include "Ball.hpp"
 
 const int SCREEN_HEIGHT = GetSystemMetrics(SM_CYSCREEN);
-const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN);
+const int SCREEN_WIDTH = GetSystemMetrics(SM_CXSCREEN)-100;
 const int AVG_FPS = 60;
 const int TIME_PER_FRAME = 1000 / AVG_FPS;
 
@@ -74,6 +74,7 @@ int main(int argc, char* argv[]) {
             Uint8 currTime = 0;
             Uint8 frameTime = 0;
             Uint8 totalFrameTime = 0;
+            srand(time(NULL));
             while(!quit) {
                 prevTime = currTime;
                 currTime = SDL_GetTicks();
@@ -144,6 +145,8 @@ int main(int argc, char* argv[]) {
                             zac.checkBallCollision();
                             troy.checkBasketballPoleCollision(&gBasketballPole);
                             zac.checkBasketballPoleCollision(&gBasketballPole);
+                            troy.checkPlayerCollision(&zac);
+                            zac.checkPlayerCollision(&troy);
                             totalFrameTime -= TIME_PER_FRAME;
                         }
                         if(!gBall.isPossessed()) {
@@ -534,6 +537,7 @@ bool loadMedia() {
         troy.setDribblingScenes();
         troy.setStandDribbleScenes();
         troy.setShootingScenes();
+        troy.setStealingScenes();
         troy.passTheBall(&gBall);
         troy.setScoreIndicator();
         troy.setScoreIndicatorPosition(0, 90);
@@ -556,6 +560,7 @@ bool loadMedia() {
         zac.setDribblingScenes();
         zac.setStandDribbleScenes();
         zac.setShootingScenes();
+        zac.setStealingScenes();
         zac.passTheBall(&gBall);
         zac.setScoreIndicator();
         zac.setScoreIndicatorPosition(troy.getScoreIndicator().x + troy.getScoreIndicator().w, 90);

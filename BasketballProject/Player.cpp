@@ -1,6 +1,7 @@
 #include "Player.hpp"
 
 const float Player::pGravity = 0.1;
+std::string Player::lastPlayerToShoot = "";
 
 Player::Player(std::string name, float jumpPower) {
     Player::pName = name;
@@ -35,6 +36,8 @@ Player::Player(std::string name, float jumpPower) {
     Player::movingLeft = false;
     Player::movingRight = false;
     Player::isTheWinner = false;
+    Player::isStealing = false;
+    Player::hasStolenTheBall = false;
     Player::pScore = 0;
     Player::pShotPosition = 0;
 }
@@ -65,12 +68,24 @@ bool Player::loadSoundEffects() {
     return success;
 }
 
+FacingDirection Player::isFacing() {
+    return facing;
+}
+
+int Player::getInitialY() {
+    return pInitialY;
+}
+
 Texture& Player::getTexture() {
     return pTexture;
 }
 
 void Player::passTheBall(Ball* b) {
     ball = b;
+}
+
+void Player::setIsStealingBall(bool i) {
+    isStealing = i;
 }
 
 bool Player::isLastFrame(int frames_count) {
@@ -81,12 +96,20 @@ bool Player::hasWon() {
     return isTheWinner;
 }
 
+bool Player::isDef() {
+    return isDefending;
+}
+
 bool Player::isBehindRim() {
     return behindRim;
 }
 
 bool Player::isJumpin() {
     return isJumping;
+}
+
+bool Player::isStealingBall() {
+    return isStealing;
 }
 
 bool Player::isBelowRim() {
@@ -114,6 +137,10 @@ void Player::setInitialPosition(int x, int y) {
     Player::pPos.y = y;
     Player::changedHeight = pTexture.getHeight();
     Player::changedWidth = pTexture.getWidth();
+}
+
+void Player::setHasStolenTheBall(bool s) {
+    hasStolenTheBall = s;
 }
 
 void Player::setFacingDirection(FacingDirection dir) {
@@ -190,7 +217,6 @@ void Player::processInput() {
             if( (!isDefending && isComingCloser && pPos.y < 478) || (isDefending && isComingCloser && pPos.y < 498)) {
                 changedHeight += 1;
                 changedWidth += 1;
-                printf("wtf\n");
                 pVelY = 1;
                 if(hasTheBall) {
                     ball->setChangedDimensions(0.2, 0.2);
@@ -363,8 +389,13 @@ void Player::checkCollision(int x, int y) {
         pPos.x = -(getTexture().getWidth() - getTextureRealWidth())/2;
     }
     else if(x != 0 && y == 0) {
-        if(pPos.x + getTextureRealWidth()*2 > x && x > 0) {
+        if(pPos.x + getTextureRealWidth()*2 >= x && x > 0) {
             pPos.x = x - getTextureRealWidth()*2;
+            pVelX = 0;
+        }
+        else if(x < 0 && pPos.x + getTextureRealWidth() <= -x) {
+            x = -x;
+            pPos.x = x - getTextureRealWidth();
             pVelX = 0;
         }
     }
@@ -391,6 +422,53 @@ void Player::checkCollision(int x, int y) {
             pPos.y = y + 1;
             pVelY = 0;
             pVelX = 0;
+        }
+    }
+}
+
+void Player::checkPlayerCollision(Player *p) {
+    if(abs(pPos.y-p->getY()-20) < 20 || abs(pPos.y-p->getY()+20) < 20) {
+        if(hasTheBall && p->isDef() && pPos.x + 2*textureRealWidth >= p->getX() + p->getTextureRealWidth() && pPos.x + textureRealWidth <= p->getX() + p->getTextureRealWidth()) {
+            if(p->isFacing() == LEFT && p->isStealingBall()) {
+                if((rand() % 2) == 1) {
+                    p->setHasStolenTheBall(true);
+                    hasTheBall = false;
+                    ball->setPossession(false);
+                    isStanding = true;
+                    ball->setIsStolen(true);
+                    ball->setIsThrown(true);
+                    ball->setPosition(pPos.x + textureRealWidth, SCREEN_HEIGHT - textureRealHeight/2);
+                    ball->setVelocity(-5,-10);
+                    ball->setFirstRotation(false);
+                    pTexture = pNormalStance;
+                }
+                else {
+                    p->setHasStolenTheBall(false);
+                    p->setIsStealingBall(false);
+                }
+            }
+            checkCollision(p->getX() + p->getTextureRealWidth(),0);
+        }
+        else if(hasTheBall && p->isDef() && pPos.x + textureRealWidth <= p->getX() + 2*p->getTextureRealWidth() && pPos.x + 2*textureRealWidth >= p->getX() + 2*p->getTextureRealWidth()) {
+            if(p->isFacing() == RIGHT && p->isStealingBall()) {
+                if((rand() % 3) == 1) {
+                    p->setHasStolenTheBall(true);
+                    hasTheBall = false;
+                    ball->setPossession(false);
+                    isStanding = true;
+                    ball->setIsStolen(true);
+                    ball->setIsThrown(true);
+                    ball->setPosition(pPos.x + textureRealWidth*2, SCREEN_HEIGHT - textureRealHeight/2);
+                    ball->setVelocity(5,-10);
+                    ball->setFirstRotation(false);
+                    pTexture = pNormalStance;
+                }
+                else {
+                    p->setHasStolenTheBall(false);
+                    p->setIsStealingBall(false);
+                }
+            }
+            checkCollision(-(p->getX() + p->getTextureRealWidth()*2),0);
         }
     }
 }
@@ -445,8 +523,8 @@ void Player::checkBallCollision() {
     if(pPos.x + getTextureRealWidth()*2 >= ball->getX()
        && pPos.x + getTextureRealWidth() <= ball->getX() + ball->getTexture().getWidth()
        && pPos.y <= ball->getY() && pPos.y + getTextureRealHeight() >= ball->getY() + ball->getTexture().getHeight()
-       && !hasTheBall && !isChangingPerspective && !ball->isPossessed()) {
-        if(isJumping && ball->getY() >= pPos.y && ball->getY() + ball->getTexture().getHeight() <= pPos.y + getTextureRealHeight()) {
+       && !hasTheBall && !isChangingPerspective && !ball->isPossessed() && !ball->hasBeenStolen()) {
+        if(isJumping && ball->getY() >= pPos.y && ball->getY() + ball->getTexture().getHeight() <= pPos.y + getTextureRealHeight() && ball->hasCollidedWithThePole()) {
             hasTheBall = true;
             ball->setPossession(true);
             hasThrownTheBall = false;
@@ -454,6 +532,9 @@ void Player::checkBallCollision() {
             ball->setVelocity(0, 0);
             ball->resetDimensions();
             //ball->setPosition(pPos.x + getTextureRealWidth()*2 - 30, pPos.y - 5);
+        }
+        else if(isJumping && facing == LEFT) {
+            ball->checkCollision(pPos.x + textureRealWidth,0);
         }
         else if(!isJumping) {
             hasTheBall = true;
@@ -470,6 +551,10 @@ void Player::checkBallCollision() {
         }
         ball->setHasScored(false);
         hasScored = false;
+        if(hasStolenTheBall) {
+            hasStolenTheBall = false;
+        }
+        ball->setIsStolen(false);
     }
     else if (hasTheBall && !ball->isThrown()) {
         ball->setPosition(pPos.x + getTextureRealWidth()*2 - 30, pPos.y - 5);

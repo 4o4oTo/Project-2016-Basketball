@@ -276,7 +276,7 @@ bool init() {
         success = false;
     }
     else {
-        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN); //SDL_WINDOW_FULLSCREEN_DESKTOP);
+        gWindow = SDL_CreateWindow("1v1 Basketball game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
         if(gWindow == NULL) {
             printf("%s\n",SDL_GetError());
             success = false;
@@ -326,8 +326,8 @@ bool loadMedia() {
     else {
         gBackgroundClip.h = SCREEN_HEIGHT;
         gBackgroundClip.w = SCREEN_WIDTH;
-        gBackgroundClip.x = SCREEN_WIDTH*0.2;
-        gBackgroundClip.y = SCREEN_HEIGHT*0.4;
+        gBackgroundClip.x = SCREEN_WIDTH*0.2 - (SCREEN_WIDTH-1366)*0.6;
+        gBackgroundClip.y = SCREEN_HEIGHT*0.4 - (SCREEN_HEIGHT-768)*0.4;
     }
 
     if(!gVictoryBackgroundTexture.loadFromFile("background/victory_background.jpg")) {
